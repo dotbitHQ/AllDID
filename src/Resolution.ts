@@ -377,6 +377,16 @@ export default class Resolution {
   }
 
   /**
+   * @param domain domain name
+   * @returns A Promise that resolves true or false
+   */
+  async isRegistered(domain: string): Promise<Boolean> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.isRegistered(domain);
+  }
+
+  /**
    * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
    * @async
    * @param address - address you wish to reverse

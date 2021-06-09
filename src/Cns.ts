@@ -208,7 +208,17 @@ export default class Cns extends NamingService {
     });
   }
 
-  private async getVerifiedData(domain: string, keys?: string[],): Promise<DomainData> {
+  async isRegistered(domain: string): Promise<boolean> {
+    const tokenId = this.namehash(domain);
+    const data = await this.get(tokenId, []);
+
+    return !isNullAddress(data.owner);
+  }
+
+  private async getVerifiedData(
+    domain: string,
+    keys?: string[],
+  ): Promise<DomainData> {
     const tokenId = this.namehash(domain);
     const data = await this.get(tokenId, keys);
     if (isNullAddress(data.resolver)) {

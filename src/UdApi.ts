@@ -10,7 +10,7 @@ import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import { CryptoRecords } from './types/publicTypes';
 import Networking from './utils/Networking';
-import {constructRecords, findNamingServiceName} from './utils';
+import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {znsNamehash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
 
@@ -156,5 +156,10 @@ export default class Udapi extends NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverse',
     });
+  }
+  async isRegistered(domain: string): Promise<boolean> {
+    const record = await this.resolve(domain);
+
+    return !isNullAddress(record.meta.owner);
   }
 }
