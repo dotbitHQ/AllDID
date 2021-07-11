@@ -110,14 +110,12 @@ export default class Udapi extends NamingService {
       });
     }
 
-    if (
-      !isValidTwitterSignature({
-        tokenId: domainMetaData.meta.namehash,
-        owner,
-        twitterHandle,
-        validationSignature,
-      })
-    ) {
+    if (!isValidTwitterSignature({
+      tokenId: domainMetaData.meta.namehash,
+      owner,
+      twitterHandle,
+      validationSignature,
+    })) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,
         {

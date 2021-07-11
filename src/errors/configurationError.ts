@@ -22,20 +22,10 @@ export enum ConfigurationErrorCode {
  * Internal Mapping object from ConfigurationErrorCode to a ConfigurationErrorHandler
  */
 const HandlersByCode = {
-  [ConfigurationErrorCode.IncorrectProvider]: () =>
-    "Provider doesn't implement sendAsync or send method",
-  [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
-    method: ResolutionMethod;
-  }) =>
-    `Unspecified network in Resolution ${params.method || ''} configuration`,
-  [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
-    method: ResolutionMethod;
-  }) => `Unspecified url in Resolution ${params.method} configuration`,
-  [ConfigurationErrorCode.DependencyMissing]: (params: {
-    dependency: string;
-    version: string;
-  }) =>
-    `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
+  [ConfigurationErrorCode.IncorrectProvider]: () => "Provider doesn't implement sendAsync or send method",
+  [ConfigurationErrorCode.UnsupportedNetwork]: (params: { method: ResolutionMethod; }) => `Unspecified network in Resolution ${params.method || ''} configuration`,
+  [ConfigurationErrorCode.UnspecifiedUrl]: (params: { method: ResolutionMethod; }) => `Unspecified url in Resolution ${params.method} configuration`,
+  [ConfigurationErrorCode.DependencyMissing]: (params: { dependency: string; version: string; }) => `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
 };
 
 /**
@@ -54,8 +44,7 @@ export class ConfigurationError extends Error {
     code: ConfigurationErrorCode,
     options: ConfigurationErrorOptions = {},
   ) {
-    const configurationErrorHandler: ConfigurationErrorHandler =
-      HandlersByCode[code];
+    const configurationErrorHandler: ConfigurationErrorHandler = HandlersByCode[code];
     super(configurationErrorHandler(options));
     this.code = code;
     this.method = options.method;

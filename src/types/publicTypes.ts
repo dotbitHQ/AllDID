@@ -14,7 +14,7 @@ export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
 export type Api = {api: true; url?: string};
 
-type NamingServiceSource = {url?: string} | {provider?: Provider};
+type NamingServiceSource = {url?: string} | {provider?: Provider}; // data source，either provider or url
 
 export type CnsSource = NamingServiceSource & {
   network: CnsSupportedNetworks;

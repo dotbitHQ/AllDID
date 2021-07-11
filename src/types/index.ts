@@ -119,8 +119,11 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
   };
 
   const unionNamespace = {guard, check, values};
+
+  type UnionNamespaceType = (typeof unionNamespace) & {type: UnionType}
+
   return Object.freeze(
-    unionNamespace as typeof unionNamespace & {type: UnionType},
+    unionNamespace as UnionNamespaceType,
   );
 };
 

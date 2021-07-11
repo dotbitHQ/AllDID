@@ -28,8 +28,8 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
     throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
   }
   return {
-    request: (request: RequestArguments) =>
-      new Promise((resolve, reject) => {
+    request (request: RequestArguments) {
+      return new Promise((resolve, reject) => {
         provider.sendAsync(
           {
             jsonrpc: '2.0',
@@ -39,19 +39,20 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
           },
           (error: Error | null, result: JsonRpcResponse) => {
             if (error) {
-              reject(error);
+              reject(error)
             }
             if (result.error) {
               reject(
                 new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
                   providerMessage: result.error,
                 }),
-              );
+              )
             }
-            resolve(result.result);
+            resolve(result.result)
           },
-        );
-      }),
+        )
+      })
+    },
   };
 }
 

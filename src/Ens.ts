@@ -54,10 +54,8 @@ export default class Ens extends NamingService {
     }
     this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
-    this.provider =
-      source['provider'] || new FetchProvider(this.name, this.url!);
-    const registryAddress =
-      source['registryAddress'] || EnsNetworkMap[this.network];
+    this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
+    const registryAddress = source['registryAddress'] || EnsNetworkMap[this.network];
     this.readerContract = new EthereumContract(
       ensInterface,
       registryAddress,
@@ -113,8 +111,7 @@ export default class Ens extends NamingService {
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
-      (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
-        domain.split('.').every((v) => !!v.length))
+      (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) && domain.split('.').every((v) => !!v.length))
     );
   }
 

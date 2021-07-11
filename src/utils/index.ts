@@ -30,8 +30,7 @@ export function constructRecords(
 ): CryptoRecords {
   const records: CryptoRecords = {};
   keys.forEach((key, index) => {
-    records[key] =
-      (values instanceof Array ? values[index] : values?.[key]) || '';
+    records[key] = (values instanceof Array ? values[index] : values?.[key]) || '';
   });
   return records;
 }
@@ -46,10 +45,11 @@ export const domainExtensionToNamingServiceName = {
   reverse: NamingServiceName.ENS,
 };
 
+/**
+ * @param domain 'abc.eth', 'abc.crypto'
+ */
 export const findNamingServiceName = (domain: string): NamingServiceName => {
-  return (
-    domainExtensionToNamingServiceName[domain.split('.').pop() || ''] || ''
-  );
+  return domainExtensionToNamingServiceName[domain.split('.').pop() || ''] || '';
 };
 
 export const EthereumNetworks = {

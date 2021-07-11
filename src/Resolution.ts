@@ -54,15 +54,9 @@ export default class Resolution {
   readonly serviceMap: Record<NamingServiceName, NamingService>;
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
-    const cns = isApi(sourceConfig?.cns)
-      ? new UdApi(sourceConfig?.cns.url)
-      : new Cns(sourceConfig?.cns);
-    const ens = isApi(sourceConfig?.ens)
-      ? new UdApi(sourceConfig?.ens.url)
-      : new Ens(sourceConfig?.ens);
-    const zns = isApi(sourceConfig?.zns)
-      ? new UdApi(sourceConfig?.zns.url)
-      : new Zns(sourceConfig?.zns);
+    const cns = isApi(sourceConfig?.cns) ? new UdApi(sourceConfig?.cns.url) : new Cns(sourceConfig?.cns);
+    const ens = isApi(sourceConfig?.ens) ? new UdApi(sourceConfig?.ens.url) : new Ens(sourceConfig?.ens);
+    const zns = isApi(sourceConfig?.zns) ? new UdApi(sourceConfig?.zns.url) : new Zns(sourceConfig?.zns);
     this.serviceMap = {
       [NamingServiceName.CNS]: cns,
       [NamingServiceName.ENS]: ens,
@@ -76,24 +70,18 @@ export default class Resolution {
    * @param sourceConfig - configuration object for ens and cns
    * @returns configured Resolution object
    */
-  static async autoNetwork(
-    sourceConfig: AutoNetworkConfigs,
-  ): Promise<Resolution> {
+  static async autoNetwork(sourceConfig: AutoNetworkConfigs,): Promise<Resolution> {
     const resolution = new this();
     if (!sourceConfig.cns && !sourceConfig.ens) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
     }
 
     if (sourceConfig.cns) {
-      resolution.serviceMap[NamingServiceName.CNS] = await Cns.autoNetwork(
-        sourceConfig.cns,
-      );
+      resolution.serviceMap[NamingServiceName.CNS] = await Cns.autoNetwork(sourceConfig.cns);
     }
 
     if (sourceConfig.ens) {
-      resolution.serviceMap[NamingServiceName.ENS] = await Ens.autoNetwork(
-        sourceConfig.ens,
-      );
+      resolution.serviceMap[NamingServiceName.ENS] = await Ens.autoNetwork(sourceConfig.ens);
     }
 
     return resolution;
@@ -231,7 +219,7 @@ export default class Resolution {
   /**
    * Resolves given domain name to a specific currency address if exists
    * @async
-   * @param domain - domain name to be resolved
+   * @param domain - domain name to be resolved, like `abc.crypto`/`abc.eth`
    * @param ticker - currency ticker like BTC, ETH, ZIL
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
