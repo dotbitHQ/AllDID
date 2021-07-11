@@ -4,7 +4,7 @@ import {
   toChecksumAddress,
 } from './utils/znsUtils';
 import {isNullAddress, constructRecords} from './utils';
-import {Dictionary, ZnsResolution, ZnsSupportedNetwork} from './types';
+import { BlockhanNetworkUrlMap, Dictionary, ZnsResolution, ZnsSupportedNetwork } from './types'
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import {
   CryptoRecords,
@@ -23,7 +23,7 @@ import ConfigurationError, {
  * @internal
  */
 export default class Zns extends NamingService {
-  static readonly UrlMap = {
+  static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://api.zilliqa.com',
     333: 'https://dev-api.zilliqa.com',
     111: 'http://localhost:4201',

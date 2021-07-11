@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import Das from './Das'
 import Ens from './Ens';
 import Zns from './Zns';
 import Cns from './Cns';
@@ -54,10 +55,13 @@ export default class Resolution {
   readonly serviceMap: Record<NamingServiceName, NamingService>;
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
+    const das = new Das(sourceConfig?.das)
     const cns = isApi(sourceConfig?.cns) ? new UdApi(sourceConfig?.cns.url) : new Cns(sourceConfig?.cns);
     const ens = isApi(sourceConfig?.ens) ? new UdApi(sourceConfig?.ens.url) : new Ens(sourceConfig?.ens);
     const zns = isApi(sourceConfig?.zns) ? new UdApi(sourceConfig?.zns.url) : new Zns(sourceConfig?.zns);
+
     this.serviceMap = {
+      [NamingServiceName.DAS]: das,
       [NamingServiceName.CNS]: cns,
       [NamingServiceName.ENS]: ens,
       [NamingServiceName.ZNS]: zns,
@@ -383,10 +387,10 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return this.serviceMap[NamingServiceName.ENS].reverse(
-      address,
-      currencyTicker,
-    );
+    return (
+      await this.serviceMap[NamingServiceName.ENS].reverse(address, currencyTicker) ||
+      await this.serviceMap[NamingServiceName.DAS].reverse(address, currencyTicker)
+    )
   }
 
   /**

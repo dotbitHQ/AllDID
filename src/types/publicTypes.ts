@@ -1,4 +1,5 @@
 import {
+  DasSupportedNetwork,
   CnsSupportedNetwork,
   EnsSupportedNetwork,
   EventFilter,
@@ -8,13 +9,14 @@ import {
   ZnsSupportedNetwork,
 } from '.';
 
+export type DasSupportedNetworks = typeof DasSupportedNetwork.type
 export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
 export type Api = {api: true; url?: string};
 
-type NamingServiceSource = {url?: string} | {provider?: Provider}; // data source，either provider or url
+export type NamingServiceSource = {url?: string} | {provider?: Provider}; // data source，either provider or url
 
 export type CnsSource = NamingServiceSource & {
   network: CnsSupportedNetworks;
@@ -31,13 +33,19 @@ export type ZnsSource = NamingServiceSource & {
   registryAddress?: string;
 };
 
+export type DasSource = NamingServiceSource & {
+  network: DasSupportedNetworks
+}
+
 export type SourceConfig = {
+  das?: DasSource
   cns?: CnsSource | Api;
   zns?: ZnsSource | Api;
   ens?: EnsSource | Api;
 };
 
 export enum NamingServiceName {
+  DAS = 'DAS',
   ENS = 'ENS',
   CNS = 'CNS',
   ZNS = 'ZNS',

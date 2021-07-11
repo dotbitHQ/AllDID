@@ -127,6 +127,8 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
   );
 };
 
+export const DasSupportedNetwork = StringUnion('mainnet', 'aggron', 'lina')
+
 export const CnsSupportedNetwork = StringUnion('mainnet', 'rinkeby');
 export const EnsSupportedNetwork = StringUnion(
   'mainnet',
@@ -135,6 +137,7 @@ export const EnsSupportedNetwork = StringUnion(
   'ropsten',
 );
 export const ZnsSupportedNetwork = StringUnion('mainnet');
+
 
 export function hasProvider(obj: any): obj is {provider: Provider} {
   return obj && !!obj.provider;

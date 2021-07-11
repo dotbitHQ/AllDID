@@ -70,7 +70,8 @@ export default class Ens extends NamingService {
 
     if (hasProvider(config)) {
       provider = config.provider;
-    } else {
+    }
+    else {
       if (!config.url) {
         throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
           method: NamingServiceName.ENS,
@@ -178,14 +179,13 @@ export default class Ens extends NamingService {
 
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = this.namehash(reverseAddress);
-    const resolverAddress = await this.resolver(reverseAddress).catch(
-      (err: ResolutionError) => {
+    const resolverAddress = await this.resolver(reverseAddress)
+      .catch((err: ResolutionError) => {
         if (err.code === ResolutionErrorCode.UnspecifiedResolver) {
           return null;
         }
         throw err;
-      },
-    );
+      })
 
     if (isNullAddress(resolverAddress)) {
       return null;
@@ -233,9 +233,7 @@ export default class Ens extends NamingService {
       '>= 0.1.x <= 0.2.x',
     ).formatsByCoinType;
     const coin = bip44constants.findIndex(
-      (item) =>
-        item[1] === currencyTicker.toUpperCase() ||
-        item[2] === currencyTicker.toUpperCase(),
+      (item) => item[1] === currencyTicker.toUpperCase() || item[2] === currencyTicker.toUpperCase()
     );
     if (coin < 0 || !formatsByCoinType[coin]) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {

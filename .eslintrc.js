@@ -19,7 +19,7 @@ module.exports = {
   rules: {
     'object-curly-spacing': ['off'],
     curly: ['error'],
-    'brace-style': 'error',
+    'brace-style': ['warn', 'stroustrup'],
     'no-unused-vars': ['off'],
     'valid-jsdoc': ['off'],
     'require-jsdoc': ['off'],
