@@ -1,5 +1,5 @@
 {
-  "name": "@unstoppabledomains/resolution",
+  "name": "@deaccountsystems/resolution",
   "version": "3.0.0",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
@@ -29,7 +29,7 @@
     "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
-    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
+    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:deaccountsystems/resolution.git docs) && git -C ./docs pull",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
@@ -46,7 +46,7 @@
   "author": "JohnnyJumper <https://github.com/JohnnyJumper>, Bogdan Gusiev <https://github.com/bogdan>, Braden Pezeshki <https://github.com/perfect-cents, Vladyslav Batyrenko <https://github.com/mvlabat>, Matthew Gould <https://github.com/theporpoise>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/unstoppabledomains/resolution.git"
+    "url": "https://github.com/DeAccountSystems/resolution.git"
   },
   "keywords": [
     "cns",
@@ -63,9 +63,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unstoppabledomains/resolution.git"
+    "url": "https://github.com/DeAccountSystems/resolution.git"
   },
-  "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
+  "homepage": "https://github.com/DeAccountSystems/resolution.git#readme",
   "devDependencies": {
     "@ensdomains/address-encoder": "0.2.6",
     "@ethersproject/providers": "^5.0.2",
