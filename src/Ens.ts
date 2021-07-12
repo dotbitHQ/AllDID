@@ -13,6 +13,7 @@ import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 import { EthereumNetworks } from './utils';
+import bip44Constants from 'bip44-constants'
 
 /**
  * @internal
@@ -212,9 +213,7 @@ export default class Ens extends NamingService {
   }
 
   protected getCoinType(currencyTicker: string): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const constants: Bip44Constants[] = require('bip44-constants');
-    const coin = constants.findIndex(
+    const coin = bip44Constants.findIndex(
       item =>
         item[1] === currencyTicker.toUpperCase() ||
         item[2] === currencyTicker.toUpperCase(),
