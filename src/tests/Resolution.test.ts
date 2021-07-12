@@ -11,7 +11,7 @@ import {
 import {JsonRpcProvider, InfuraProvider} from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
-import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
+// import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
@@ -644,36 +644,36 @@ describe('Resolution', () => {
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
 
-        it('should work with web3@0.20.7 provider', async () => {
-          const provider = new Web3V027Provider(
-            protocolLink(ProviderProtocol.http),
-            5000,
-            null,
-            null,
-            null,
-          );
-          const eye = mockAsyncMethod(
-            provider,
-            'sendAsync',
-            (payload: JsonRpcPayload, callback: any) => {
-              const result = caseMock(
-                payload.params?.[0],
-                RpcProviderTestCases,
-              );
-              callback(undefined, {
-                jsonrpc: '2.0',
-                id: 1,
-                result,
-              });
-            },
-          );
-          const resolution = Resolution.fromWeb3Version0Provider(provider, {
-            cns: {network: 'mainnet'},
-          });
-          const ethAddress = await resolution.addr('brad.crypto', 'eth');
-          expectSpyToBeCalled([eye]);
-          expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
-        });
+        // it('should work with web3@0.20.7 provider', async () => {
+        //   const provider = new Web3V027Provider(
+        //     protocolLink(ProviderProtocol.http),
+        //     5000,
+        //     null,
+        //     null,
+        //     null,
+        //   );
+        //   const eye = mockAsyncMethod(
+        //     provider,
+        //     'sendAsync',
+        //     (payload: JsonRpcPayload, callback: any) => {
+        //       const result = caseMock(
+        //         payload.params?.[0],
+        //         RpcProviderTestCases,
+        //       );
+        //       callback(undefined, {
+        //         jsonrpc: '2.0',
+        //         id: 1,
+        //         result,
+        //       });
+        //     },
+        //   );
+        //   const resolution = Resolution.fromWeb3Version0Provider(provider, {
+        //     cns: {network: 'mainnet'},
+        //   });
+        //   const ethAddress = await resolution.addr('brad.crypto', 'eth');
+        //   expectSpyToBeCalled([eye]);
+        //   expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+        // });
 
         describe('.All-get', () => {
           it('should be able to get logs with ethers default provider', async () => {
