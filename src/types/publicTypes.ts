@@ -14,8 +14,6 @@ export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
-export type Api = {api: true; url?: string};
-
 export type NamingServiceSource = {url?: string} | {provider?: Provider}; // data source，either provider or url
 
 export type CnsSource = NamingServiceSource & {
@@ -39,9 +37,9 @@ export type DasSource = NamingServiceSource & {
 
 export type SourceConfig = {
   das?: DasSource
-  cns?: CnsSource | Api;
-  zns?: ZnsSource | Api;
-  ens?: EnsSource | Api;
+  cns?: CnsSource
+  zns?: ZnsSource
+  ens?: EnsSource
 };
 
 export enum NamingServiceName {
@@ -51,7 +49,7 @@ export enum NamingServiceName {
   ZNS = 'ZNS',
 }
 
-export type ResolutionMethod = NamingServiceName | 'UDAPI';
+export type ResolutionMethod = NamingServiceName
 
 export type AutoNetworkConfigs = {
   ens?: {url: string} | {provider: Provider};
@@ -132,7 +130,6 @@ export interface EthersProvider {
   getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
 }
 
-export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 export type NamehashOptions = {
   readonly format?: 'dec' | 'hex';
   readonly prefix?: boolean;

@@ -3,9 +3,7 @@ import Das from './Das'
 import Ens from './Ens';
 import Zns from './Zns';
 import Cns from './Cns';
-import UdApi from './UdApi';
 import {
-  Api,
   AutoNetworkConfigs,
   CnsSupportedNetworks,
   CryptoRecords,
@@ -56,9 +54,9 @@ export default class Resolution {
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
     const das = new Das(sourceConfig?.das)
-    const cns = isApi(sourceConfig?.cns) ? new UdApi(sourceConfig?.cns.url) : new Cns(sourceConfig?.cns);
-    const ens = isApi(sourceConfig?.ens) ? new UdApi(sourceConfig?.ens.url) : new Ens(sourceConfig?.ens);
-    const zns = isApi(sourceConfig?.zns) ? new UdApi(sourceConfig?.zns.url) : new Zns(sourceConfig?.zns);
+    const cns = new Cns(sourceConfig?.cns)
+    const ens = new Ens(sourceConfig?.ens)
+    const zns = new Zns(sourceConfig?.zns)
 
     this.serviceMap = {
       [NamingServiceName.DAS]: das,
@@ -547,7 +545,3 @@ export default class Resolution {
 }
 
 export {Resolution};
-
-function isApi(obj: any): obj is Api {
-  return obj && obj.api;
-}

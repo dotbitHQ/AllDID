@@ -1,39 +1,32 @@
-import nock from 'nock';
-import Resolution, {
-  ResolutionErrorCode,
-  UnclaimedDomainResponse,
-} from '../index';
-import {
-  DnsRecordType,
-  JsonRpcPayload,
-  NamingServiceName,
-} from '../types/publicTypes';
-import {JsonRpcProvider, InfuraProvider} from '@ethersproject/providers';
-import Web3HttpProvider from 'web3-providers-http';
-import Web3WsProvider from 'web3-providers-ws';
+import { InfuraProvider, JsonRpcProvider } from '@ethersproject/providers'
+import nock from 'nock'
+import fetch, { FetchError } from 'node-fetch'
+import Web3HttpProvider from 'web3-providers-http'
+import Web3WsProvider from 'web3-providers-ws'
+import Cns from '../Cns'
+import Ens from '../Ens'
+import { ConfigurationErrorCode } from '../errors/configurationError'
+import FetchProvider from '../FetchProvider'
+import Resolution, { ResolutionErrorCode, UnclaimedDomainResponse } from '../index'
+import { DnsRecordType, JsonRpcPayload, NamingServiceName } from '../types/publicTypes'
+import { RpcProviderTestCases } from '../utils/providerMockData'
+import Zns from '../Zns'
 // import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
-  expectResolutionErrorCode,
-  expectSpyToBeCalled,
-  mockAsyncMethods,
-  protocolLink,
-  ProviderProtocol,
   caseMock,
-  mockAsyncMethod,
+  CryptoDomainWithAllRecords,
   CryptoDomainWithTwitterVerification,
-  pendingInLive,
-  isLive,
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
-  CryptoDomainWithAllRecords,
-} from './helpers';
-import {RpcProviderTestCases} from '../utils/providerMockData';
-import fetch, {FetchError} from 'node-fetch';
-import Cns from '../Cns';
-import Zns from '../Zns';
-import Ens from '../Ens';
-import FetchProvider from '../FetchProvider';
-import {ConfigurationErrorCode} from '../errors/configurationError';
+  expectResolutionErrorCode,
+  expectSpyToBeCalled,
+  isLive,
+  mockAsyncMethod,
+  mockAsyncMethods,
+  pendingInLive,
+  protocolLink,
+  ProviderProtocol,
+} from './helpers'
 
 let resolution: Resolution;
 let cns: Cns;
@@ -93,7 +86,7 @@ describe('Resolution', () => {
 
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider(
-        'UDAPI',
+        NamingServiceName.ENS,
         protocolLink().replace('mainnet', 'rinkeby'),
       );
       const spy = mockAsyncMethod(provider, 'request', '4');
