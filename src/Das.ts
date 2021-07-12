@@ -110,6 +110,12 @@ export default class Das extends NamingService {
     return accounts[0]
   }
 
+  async isRegistered(domain: string): Promise<boolean> {
+    const accountData = await this.getAccountData(domain);
+
+    return Boolean(accountData);
+  }
+
   async allReverse(address: string): Promise<string[]> {
     const data = await this.provider.request({
       method: 'das_getAddressAccount',
@@ -129,6 +135,26 @@ export default class Das extends NamingService {
   }
 
   async allRecords (domain: string): Promise<Record<string, string>> {
+    const data = await this.getAccountData(domain)
+
+    if (data) {
+      const records = data.account_data.records
+
+      const returnee: CryptoRecords = {}
+
+      records.forEach(record => {
+        returnee[record.key] = record.value
+      })
+
+      return returnee
+    }
+    // no records
+    else {
+      return {}
+    }
+  }
+
+  async getAccountData(domain: string): Promise<any> {
     const data = await this.provider.request({
       method: 'das_searchAccount',
       params: [
@@ -136,14 +162,6 @@ export default class Das extends NamingService {
       ]
     }) as any
 
-    const records = data.data.account_data.records
-
-    const returnee: CryptoRecords = {}
-
-    records.forEach(record => {
-      returnee[record.key] = record.value
-    })
-
-    return returnee
+    return data.data
   }
 }

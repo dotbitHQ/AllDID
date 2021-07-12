@@ -191,6 +191,12 @@ export default class Ens extends NamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
+  async isRegistered(domain: string): Promise<boolean> {
+    const owner = await this.owner(domain);
+
+    return !isNullAddress(owner);
+  }
+
   /**
    * This was done to make automated tests more configurable
    */
