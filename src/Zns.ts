@@ -7,11 +7,9 @@ import {isNullAddress, constructRecords} from './utils';
 import { BlockhanNetworkUrlMap, Dictionary, ZnsResolution, ZnsSupportedNetwork } from './types'
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import {
-  CryptoRecords,
-  Provider,
-  ZnsSource,
   NamingServiceName,
-} from './types/publicTypes';
+} from './index';
+import { CryptoRecords, Provider, ZnsSource } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
 import {NamingService} from './NamingService';
