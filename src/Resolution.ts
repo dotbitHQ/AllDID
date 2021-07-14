@@ -1,8 +1,10 @@
-import BN from 'bn.js';
+import BN from 'bn.js'
+import Cns from './Cns'
 import Das from './Das'
-import Ens from './Ens';
-import Zns from './Zns';
-import Cns from './Cns';
+import Ens from './Ens'
+import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError'
+import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError'
+import { NamingService } from './NamingService'
 import {
   AutoNetworkConfigs,
   CnsSupportedNetworks,
@@ -19,20 +21,17 @@ import {
   SourceConfig,
   Web3Version0Provider,
   Web3Version1Provider,
-} from './types/publicTypes';
-import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
-import DnsUtils from './utils/DnsUtils';
-import {findNamingServiceName, signedInfuraLink} from './utils';
-import {Eip1993Factories} from './utils/Eip1993Factories';
-import {NamingService} from './NamingService';
-import ConfigurationError from './errors/configurationError';
-import {ConfigurationErrorCode} from './errors/configurationError';
+} from './types/publicTypes'
+import { findNamingServiceName, signedInfuraLink } from './utils'
+import DnsUtils from './utils/DnsUtils'
+import { Eip1993Factories } from './utils/Eip1993Factories'
+import Zns from './Zns'
 
 /**
  * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
- * import Resolution from '@unstoppabledomains/resolution';
+ * import Resolution from 'denames';
  *
  * let resolution = new Resolution({ blockchain: {
  *        ens: {
@@ -227,7 +226,17 @@ export default class Resolution {
    * @returns A promise that resolves in an address
    */
   async addr(domain: string, ticker: string): Promise<string> {
-    return await this.record(domain, `crypto.${ticker.toUpperCase()}.address`);
+    const method = this.getNamingMethodOrThrow(domain)
+
+    let key
+    if (method.serviceName() === NamingServiceName.DAS) {
+      key = `address.${ticker.toLowerCase()}`
+    }
+    else {
+      key = `crypto.${ticker.toUpperCase()}.address`
+    }
+
+    return await this.record(domain, key);
   }
 
   /**
