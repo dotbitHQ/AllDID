@@ -22,7 +22,7 @@
     "test:live:win": "set LIVE=1&& yarn test",
     "start": "npm run build:live",
     "dev": "yarn build && ./build/cli/cli.js -d brad.crypto",
-    "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
+    "build": "rm -rf build && tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
     "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:zgayjjf/denames.git docs) && git -C ./docs pull",
