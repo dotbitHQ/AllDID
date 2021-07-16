@@ -1,6 +1,6 @@
 {
   "name": "denames",
-  "version": "3.0.0",
+  "version": "0.0.2",
   "description": "Domain Resolution for blockchain accounts and domains",
   "main": "./build/index.js",
   "directories": {
