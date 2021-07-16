@@ -94,7 +94,7 @@ describe('Resolution', () => {
         cns: {provider},
         ens: {provider},
       });
-      expect(spy).toBeCalledTimes(1);
+      expect(spy).toBeCalledTimes(2);
       expect(
         (resolution.serviceMap[NamingServiceName.CNS] as Cns).network,
       ).toBe(4);

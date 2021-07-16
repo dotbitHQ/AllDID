@@ -1,6 +1,6 @@
 import BN from 'bn.js'
 import Cns from './Cns'
-import Das from './Das'
+import Das from 'das-sdk'
 import Ens from './Ens'
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError'
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError'

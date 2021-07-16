@@ -174,12 +174,9 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService:
-    | NamingServiceName.ENS
-    | NamingServiceName.CNS = NamingServiceName.CNS,
+  namingService: | NamingServiceName.ENS | NamingServiceName.CNS = NamingServiceName.CNS,
 ): string {
-  const secret =
-    process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
+  const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
 
   if (!secret) {
     return ethereumDefaultProviders[namingService][providerProtocol];
