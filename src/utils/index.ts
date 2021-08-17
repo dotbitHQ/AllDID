@@ -37,6 +37,7 @@ export function constructRecords(
 }
 
 export const domainExtensionToNamingServiceName = {
+  bit: NamingServiceName.DAS,
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
   eth: NamingServiceName.ENS,
@@ -46,19 +47,19 @@ export const domainExtensionToNamingServiceName = {
   reverse: NamingServiceName.ENS,
 };
 
-export const findNamingServiceName = (
-  domain: string,
-): NamingServiceName | '' => {
+export function findNamingServiceName(domain: string): NamingServiceName | '' {
   const extension = domain.split('.').pop();
 
   if (!extension) {
     return '';
   } else if (extension in domainExtensionToNamingServiceName) {
     return domainExtensionToNamingServiceName[extension];
-  } else {
+  }
+  // fallback to UNS to support .888 .nft .blockchain etc
+  else {
     return domainExtensionToNamingServiceName.crypto;
   }
-};
+}
 
 export const EthereumNetworks = {
   mainnet: 1,

@@ -1,8 +1,11 @@
 import BN from 'bn.js';
+import Das from './Das';
 import Ens from './Ens';
-import Zns from './Zns';
-import Uns from './Uns';
-import UdApi from './UdApi';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
+import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
+import {NamingService} from './NamingService';
 import {
   Api,
   AutoNetworkConfigs,
@@ -16,18 +19,17 @@ import {
   Provider,
   ResolutionMethod,
   SourceConfig,
+  TokenUriMetadata,
   Web3Version0Provider,
   Web3Version1Provider,
-  TokenUriMetadata,
 } from './types/publicTypes';
-import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
-import DnsUtils from './utils/DnsUtils';
+import UdApi from './UdApi';
+import Uns from './Uns';
 import {findNamingServiceName, signedInfuraLink} from './utils';
+import DnsUtils from './utils/DnsUtils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
-import {NamingService} from './NamingService';
-import ConfigurationError from './errors/configurationError';
-import {ConfigurationErrorCode} from './errors/configurationError';
 import Networking from './utils/Networking';
+import Zns from './Zns';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -54,16 +56,22 @@ export default class Resolution {
   readonly serviceMap: Record<NamingServiceName, NamingService>;
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
+    const das = new Das(sourceConfig?.das);
+
     const ens = isApi(sourceConfig?.ens)
       ? new UdApi(sourceConfig?.ens)
       : new Ens(sourceConfig?.ens);
+
     const uns = isApi(sourceConfig?.uns)
       ? new UdApi(sourceConfig?.uns)
       : new Uns(sourceConfig?.uns);
+
     const zns = isApi(sourceConfig?.zns)
       ? new UdApi(sourceConfig?.zns)
       : new Zns(sourceConfig?.zns);
+
     this.serviceMap = {
+      [NamingServiceName.DAS]: das,
       [NamingServiceName.UNS]: uns,
       [NamingServiceName.ZNS]: zns,
       [NamingServiceName.ENS]: ens,
@@ -79,7 +87,7 @@ export default class Resolution {
   static async autoNetwork(
     sourceConfig: AutoNetworkConfigs,
   ): Promise<Resolution> {
-    const resolution = new this();
+    const resolution = new Resolution();
     if (!sourceConfig.uns && !sourceConfig.ens) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
     }
@@ -115,7 +123,7 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return new this({
+    return new Resolution({
       sourceConfig: {
         ens: {
           url: signedInfuraLink(infura, networks?.ens?.network),
@@ -177,7 +185,7 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return new this({
+    return new Resolution({
       sourceConfig: {
         ens: {provider, network: networks?.ens?.network || 'mainnet'},
         uns: {provider, network: networks?.uns?.network || 'mainnet'},
@@ -199,7 +207,7 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return new this({
+    return new Resolution({
       sourceConfig: {
         zns: {provider, network: networks?.zns?.network || 'mainnet'},
       },
@@ -308,7 +316,10 @@ export default class Resolution {
   ): Promise<string> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    if (method.serviceName() === NamingServiceName.ENS) {
+    if (
+      method.serviceName() === NamingServiceName.ENS ||
+      method.serviceName() === NamingServiceName.DAS
+    ) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         methodName: NamingServiceName.ENS,
         domain,

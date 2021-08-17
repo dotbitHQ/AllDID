@@ -124,6 +124,13 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
   );
 };
 
+export const DasSupportedNetwork = StringUnion(
+  'mainnet',
+  'lina', // currently mainnet version is lina
+  'testnet',
+  'aggron', // the most used testnet version is aggron
+);
+
 export const UnsSupportedNetwork = StringUnion('mainnet', 'rinkeby');
 export const EnsSupportedNetwork = StringUnion(
   'mainnet',

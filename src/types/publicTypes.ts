@@ -9,6 +9,10 @@ export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
+export type DasSource = Api & {
+  network: string;
+};
+
 export type UnsSource = NamingServiceSource & {
   network: string;
   proxyReaderAddress?: string;
@@ -25,12 +29,14 @@ export type ZnsSource = NamingServiceSource & {
 };
 
 export type SourceConfig = {
+  das?: DasSource;
   uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
   ens?: EnsSource | Api;
 };
 
 export enum NamingServiceName {
+  DAS = 'DAS',
   UNS = 'UNS',
   ENS = 'ENS',
   ZNS = 'ZNS',
