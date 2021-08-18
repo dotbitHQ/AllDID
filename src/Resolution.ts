@@ -6,6 +6,7 @@ import ConfigurationError, {
 } from './errors/configurationError';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {NamingService} from './NamingService';
+import {DasAccountRecord} from './types/DAS';
 import {
   Api,
   AutoNetworkConfigs,
@@ -689,6 +690,35 @@ export default class Resolution {
 
   private prepareDomain(domain: string): string {
     return domain ? domain.trim().toLowerCase() : '';
+  }
+
+  /* methods below are added for DAS */
+
+  /**
+   * Resolves given domain name to a specific currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param ticker - currency ticker like BTC, ETH, ZIL
+   * @throws [[ResolutionError]] if address is not found
+   * @returns A promise that resolves in an address
+   */
+  async addrList(domain: string, ticker: string): Promise<DasAccountRecord[]> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+
+    if (method.serviceName() === NamingServiceName.DAS) {
+      return (method as Das).addrList(domain, ticker);
+    } else {
+      return [
+        {
+          key: `crypto.${ticker.toUpperCase()}.address`,
+          label: '',
+          value: await this.addr(domain, ticker),
+          avatar: '',
+          ttl: 0,
+        },
+      ];
+    }
   }
 }
 

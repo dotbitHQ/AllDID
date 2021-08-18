@@ -3,7 +3,7 @@ import FetchProvider from './FetchProvider';
 import {NamingService} from './NamingService';
 import {DasAccountCell, DasAccountData, DasAccountRecord} from './types/DAS';
 import {DasSource, NamingServiceName, Provider} from './types/publicTypes';
-import {constructRecords, isNullAddress} from './utils';
+import {constructRecords} from './utils';
 
 /**
  * @internal
@@ -187,5 +187,29 @@ export default class Das extends NamingService {
     })) as {data: DasAccountCell};
 
     return response?.data?.account_data;
+  }
+
+  async recordList(account: string, key: string): Promise<DasAccountRecord[]> {
+    const accountData = await this.account(account);
+
+    if (!accountData) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: account,
+      });
+    }
+
+    return accountData.records
+      .filter((record) => record.key === key)
+      .map((record) => {
+        return {
+          ...record,
+          ttl: Number(record.ttl),
+          avatar: `https://identicons.da.systems/identicon/${account}`,
+        };
+      });
+  }
+
+  async addrList(account: string, ticker: string): Promise<DasAccountRecord[]> {
+    return await this.recordList(account, `address.${ticker.toLowerCase()}`);
   }
 }

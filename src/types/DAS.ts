@@ -15,8 +15,6 @@ export interface DasRecord {
 // add some useful fields
 export interface DasAccountRecord extends Omit<DasRecord, 'ttl'> {
   ttl: number;
-  type: DasRecordType;
-  strippedKey: string;
   avatar: string;
 }
 
