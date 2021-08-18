@@ -36,7 +36,7 @@ import Zns from './Zns';
  * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
- * import Resolution from '@unstoppabledomains/resolution';
+ * import { Resolution } from 'denames';
  *
  * let resolution = new Resolution({ blockchain: {
  *        uns: {
