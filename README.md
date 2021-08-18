@@ -109,9 +109,18 @@ yarn add denames
 
 Create a new file in your project, `address.js`.
 
+> It is recommended that developers set up their own [DAS Indexer](https://github.com/DeAccountSystems/das_account_indexer), see [das-sdk-js](https://github.com/DeAccountSystems/das-sdk-js#configuration) for details.
+
 ```javascript
 const { Resolution } = require('denames');
-const resolution = new Resolution();
+const resolution = new Resolution({
+  sourceConfig: {
+    das: {
+      url: 'https://indexer.da.systems', // DAS indexer JSON-RPC endpoint. You can use the indexer provided by DAS team for test.
+      network: 'mainnet',
+    }
+  }
+});
 
 function resolve(domain, currency) {
   resolution
