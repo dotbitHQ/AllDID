@@ -9,7 +9,8 @@ export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
-export type DasSource = Api & {
+export type DasSource = {
+  url: string;
   network: string;
 };
 
