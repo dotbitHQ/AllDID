@@ -12,18 +12,9 @@
 - [Error Handling](README.md#error-handling)
 - [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
 
-Denames is a library for interacting with blockchain domain names. It can be
-used to retrieve
-[payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses),
-IPFS hashes for
-[decentralized websites](https://unstoppabledomains.com/features#Build-Website),
-and GunDB usernames for
-[decentralized chat](https://unstoppabledomains.com/chat).
+Denames is a library for interacting with blockchain accounts and domains. It can be used to retrieve crypto addresses on blockchain, users social contacts and custom records. 
 
-Denames is primarily built and maintained by
-[Unstoppable Domains](https://unstoppabledomains.com/).
-
-Denames supports decentralized domains across below zones:
+Denames supports decentralized accounts/domains across below zones:
 
 - Decentralized Account Systems(DAS)
   - `.bit`
@@ -49,8 +40,36 @@ Denames supports decentralized domains across below zones:
   - `.x`
   - ...
 
-For more information, see our detailed
-[API Referrence](https://unstoppabledomains.github.io/resolution/).
+### Background
+The Denames is currently built on top of `@unstoppabledomain/resolution` version `v5.0.1`, and added support for [DAS](https://da.systems) alongside with ENS, UNS, ZNS.
+
+Denames introduced a method which will return a list of crypto addresses for the given chain:
+```javascript
+import { Resolution } from 'denames'
+
+const resolution = new Resolution()
+const account = 'dastodamoon.bit'
+
+resolution.addrList(account, 'ckb').then(records => {
+  console.log(`account ${account} has ${records.length} CKB address records as below:`)
+  
+  records.forEach((record, i) => {
+    const { key, value, label, ttl, avatar } = record
+    console.log(`CKB address ${i}: ${value}, label: ${label}, with a ttl ${ttl}`)
+  })
+})
+
+```
+output:
+```shell
+account dastodamoon.bit has 2 CKB address records as below:
+CKB address 0: ckb1qyqzeajw8xtqgvw0d6q8ey7sysvv7evxvwqqvnvmwu, label: BusinessAddress, with a ttl 300
+CKB address 1: ckb1qyq9j48k60dll8xjw04u2uu6vvd0fypqjkhqq84pmt, label: PersonalAddress, with a ttl 300
+```
+
+It will return an empty list `[]` when no records are set.
+
+> For other methods, please see [@unstoppabledomains/resolution API Reference](https://unstoppabledomains.github.io/resolution/)
 
 ### ENS support
 **Note: Ethereum Name Service requires installing additional packages 
@@ -86,7 +105,7 @@ yarn init -y
 yarn add denames
 ```
 
-### Look up a domain's crypto address
+### Look up account's crypto addresses
 
 Create a new file in your project, `address.js`.
 
@@ -96,77 +115,21 @@ const resolution = new Resolution();
 
 function resolve(domain, currency) {
   resolution
-    .addr(domain, currency)
-    .then((address) => console.log(domain, 'resolves to', address))
+    .addrList(domain, currency)
+    .then((records) => console.log(domain, 'resolves to', records[0]?.value))
     .catch(console.error);
 }
 
-function resolveMultiChain(domain, currency, chain) {
-  resolution
-    .multiChainAddr(domain, currency, chain)
-    .then((address) => console.log(domain, 'resolves to', address, version))
-    .catch(console.error);
-}
-
-resolve('brad.crypto', 'ETH');
+resolve('dastodamoon.bit', 'CKB');
 resolve('brad.zil', 'ZIL');
-resolveMultiChain('brad.crypto', 'USDT', 'ERC20');
-resolveMultiChain('brad.crypto', 'USDT', 'OMNI');
 ```
 
 Execute the script.
 
 ```shell
 $ node address.js
-brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
+dastodamoon.bit resolves to ckb1qyqzeajw8xtqgvw0d6q8ey7sysvv7evxvwqqvnvmwu
 brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
-```
-
-### Find the IPFS hash for a decentralized website
-
-Create a new file in your project, `ipfs_hash.js`.
-
-```javascript
-const { Resolution } = require('denames');
-const resolution = new Resolution();
-
-function resolveIpfsHash(domain) {
-  resolution
-    .ipfsHash(domain)
-    .then((hash) =>
-      console.log(
-        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
-      ),
-    )
-    .catch(console.error);
-}
-
-resolveIpfsHash('homecakes.crypto');
-```
-
-Execute the script.
-
-```shell
-$ node ipfs_hash.js
-You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv
-```
-
-### Find a custom record
-
-Create a new file in your project, `custom-denames.js`.
-
-```javascript
-const { Resolution } = require('denames');
-const resolution = new Resolution();
-
-function resolveCustomRecord(domain, record) {
-  resolution
-    .records(domain, [record])
-    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
-    .catch(console.error);
-}
-
-resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 ```
 
 ### Command Line Interface
@@ -270,21 +233,6 @@ or **Linux shell**).
 - Supported keys: `$ yarn supported-keys:pull`
 - Both configs: `$ yarn config:pull`
 
-## Free advertising for integrated apps
-
-Once your app has a working Unstoppable Domains integration,
-[register it here](https://unstoppabledomains.com/app-submission). Registered
-apps appear on the Unstoppable Domains
-[homepage](https://unstoppabledomains.com/) and
-[Applications](https://unstoppabledomains.com/apps) page — putting your app in
-front of tens of thousands of potential customers per day.
-
-Also, every week we select a newly-integrated app to feature in the Unstoppable
-Update newsletter. This newsletter is delivered to straight into the inbox of
-~100,000 crypto fanatics — all of whom could be new customers to grow your
-business.
-
 ## Get help
 
-[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask
-questions.
+[Join our discord community](https://discord.gg/B7aa5fXq) and ask questions.
