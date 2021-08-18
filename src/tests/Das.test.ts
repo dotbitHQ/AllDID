@@ -15,7 +15,7 @@ let das: Das;
 
 const DasAccountRegistered = 'dastodamoon.bit';
 const DasAccountUnregistered = 'dastodamoon1.bit';
-const jsonRpcResponse = {
+export const jsonRpcResponse = {
   jsonrpc: '2.0',
   id: 1,
   result: {
@@ -46,6 +46,12 @@ const jsonRpcResponse = {
           {
             key: 'address.ckb',
             label: 'BusinessAddress',
+            value: 'ckb1qyqzeajw8xtqgvw0d6q8ey7sysvv7evxvwqqvnvmwu',
+            ttl: '300',
+          },
+          {
+            key: 'address.ckb',
+            label: 'PersonalAddress',
             value: 'ckb1qyqzeajw8xtqgvw0d6q8ey7sysvv7evxvwqqvnvmwu',
             ttl: '300',
           },
@@ -238,11 +244,22 @@ describe('DAS', () => {
     });
   });
 
-  it('should throw error for childhash', async () => {
+  it('should throw error for unregistered account', async () => {
     const eyes = mockAsyncMethod(das, 'account', null);
 
     await expectResolutionErrorCode(
       () => resolution.allRecords(DasAccountRegistered),
+      ResolutionErrorCode.UnregisteredDomain,
+    );
+
+    expectSpyToBeCalled([eyes]);
+  });
+
+  it('should throw error for unregistered account when using recordList', async () => {
+    const eyes = mockAsyncMethod(das, 'account', null);
+
+    await expectResolutionErrorCode(
+      () => resolution.addrList(DasAccountRegistered, 'eth'),
       ResolutionErrorCode.UnregisteredDomain,
     );
 

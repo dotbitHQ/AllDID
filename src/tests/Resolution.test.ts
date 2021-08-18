@@ -13,6 +13,8 @@ import {JsonRpcProvider, InfuraProvider} from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3/lib/web3/httpprovider';
+import Networking from '../utils/Networking';
+import {jsonRpcResponse} from './Das.test';
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
@@ -1241,6 +1243,57 @@ describe('Resolution', () => {
           'COM' as NamingServiceName,
         ),
       ).toThrowError('Naming service COM is not supported');
+    });
+  });
+
+  describe('.addrList', () => {
+    it('multiple address for .bit', async () => {
+      const eyes = mockAsyncMethod(Networking, 'fetch', {
+        status: 200,
+        json: () => jsonRpcResponse,
+      });
+
+      const addrs = await resolution.addrList('dastodamoon.bit', 'ckb');
+
+      expectSpyToBeCalled([eyes]);
+
+      expect(addrs.length).toBe(2);
+      expect(addrs[0].label).toBe('BusinessAddress');
+      expect(addrs[1].label).toBe('PersonalAddress');
+    });
+
+    it('empty address for .bit', async () => {
+      const eyes = mockAsyncMethod(Networking, 'fetch', {
+        status: 200,
+        json: () => jsonRpcResponse,
+      });
+
+      const addrs = await resolution.addrList('dastodamoon.bit', 'bnb');
+
+      expectSpyToBeCalled([eyes]);
+
+      expect(addrs.length).toBe(0);
+    });
+
+    it('return list for .eth', async () => {
+      const eyes = mockAsyncMethods(ens, {
+        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      });
+
+      const ethList = await resolution.addrList('testthing.eth', 'ETH');
+
+      expectSpyToBeCalled(eyes);
+
+      expect(ethList).toEqual([
+        {
+          key: `crypto.ETH.address`,
+          label: '',
+          value: '0x314159265dD8dbb310642f98f50C066173C1259b',
+          avatar: '',
+          ttl: 0,
+        },
+      ]);
     });
   });
 });
