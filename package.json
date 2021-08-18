@@ -1,14 +1,14 @@
 {
-  "name": "@unstoppabledomains/resolution",
-  "version": "4.0.0",
-  "description": "Domain Resolution for blockchain domains",
+  "name": "denames",
+  "version": "1.1.0",
+  "description": "An all-in-one library to resolve decentralized accounts/domains",
   "main": "./build/index.js",
   "directories": {
     "doc": "docs"
   },
   "types": "./build/index.d.ts",
   "bin": {
-    "resolution": "./build/cli/cli.js"
+    "denames": "./build/cli/cli.js"
   },
   "scripts": {
     "release": "RELEASE=patch yarn release:run",
@@ -26,19 +26,19 @@
     "start": "npm run build:live",
     "dev": "yarn build && ./build/cli/cli.js -d brad.crypto",
     "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
-    "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
+    "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/denames",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
-    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
+    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:DeAccountSystems/denames.git docs) && git -C ./docs pull",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
     "size": "yarn run sizecheck -p ./package.json -l 500 -v",
     "config:pull": "yarn network-config:pull && yarn supported-keys:pull",
-    "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json",
+    "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/uns-config.json -o src/config/uns-config.json",
     "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json",
     "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "prepare": "husky install"
+    "prepare": "([ -d ./.git ] && husky install) || echo \"Skip husky install since package does not have .git folder\""
   },
   "files": [
     "build"
@@ -46,12 +46,15 @@
   "author": "JohnnyJumper <https://github.com/JohnnyJumper>, Bogdan Gusiev <https://github.com/bogdan>, Braden Pezeshki <https://github.com/perfect-cents, Vladyslav Batyrenko <https://github.com/mvlabat>, Matthew Gould <https://github.com/theporpoise>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/unstoppabledomains/resolution.git"
+    "url": "https://github.com/DeAccountSystems/denames.git"
   },
   "keywords": [
+    "das",
+    ".bit",
     "cns",
     ".crypto",
     "zns",
+    "ens",
     "ethereum",
     "zilliqa",
     "blockchain",
@@ -62,12 +65,14 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unstoppabledomains/resolution.git"
+    "url": "https://github.com/DeAccountSystems/denames.git"
   },
-  "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
+  "homepage": "https://github.com/DeAccountSystems/denames.git",
   "devDependencies": {
+    "@ensdomains/address-encoder": "0.2.6",
     "@ethersproject/providers": "^5.0.2",
     "@types/bn.js": "^4.11.6",
+    "@types/elliptic": "^6.4.13",
     "@types/jest": "24.0.23",
     "@types/lodash": "^4.14.158",
     "@types/node": "11.15.3",
@@ -75,24 +80,28 @@
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
     "@unstoppabledomains/sizecheck": "^4.0.0",
+    "@zilliqa-js/core": "2.3.0-alpha.0",
     "audit-ci": "^3.1.1",
+    "bip44-constants": "^8.0.5",
+    "content-hash": "^2.5.2",
     "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jest": "^24.1.0",
     "husky": "^6.0.0",
-    "jest": "24.9.0",
+    "jest": "^27.0.4",
+    "lint-staged": "^11.0.0",
     "lodash": "^4.17.19",
     "nock": "10.0.6",
     "nodemon": "^2.0.7",
     "prettier": "2.3.0",
     "pretty-quick": "^3.1.0",
-    "ts-jest": "24.2.0",
+    "ts-jest": "^27.0.3",
     "ts-loader": "6.2.1",
     "ts-node": "^8.6.2",
     "typedoc": "0.17.8",
     "typescript": "3.8.3",
-    "web3-0.20.7": "npm:web3@0.20.7",
+    "web3": "0.20.7",
     "web3-providers-http": "^1.3.6",
     "web3-providers-ws": "^1.3.6"
   },
@@ -103,8 +112,14 @@
     "@ethersproject/abi": "^5.0.1",
     "bn.js": "^4.4.0",
     "commander": "^4.1.1",
+    "elliptic": "^6.5.4",
+    "ethereum-ens-network-map": "^1.0.2",
     "js-sha256": "^0.9.0",
     "js-sha3": "^0.8.0",
     "node-fetch": "^2.6.0"
+  },
+  "lint-staged": {
+    "src/**/*.ts": "eslint --fix",
+    "src/**/*.{ts,tsx,js,jsx,json,md}": "prettier --write -l"
   }
 }

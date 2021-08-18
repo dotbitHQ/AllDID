@@ -9,6 +9,7 @@ module.exports = {
     },
   },
   testTimeout: 40000,
+  collectCoverage: true,
   coveragePathIgnorePatterns : [
     '/node_modules/',
     '/src/tests/',
