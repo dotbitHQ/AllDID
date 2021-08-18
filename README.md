@@ -41,7 +41,7 @@ Denames supports decentralized accounts/domains across below zones:
   - ...
 
 ### Background
-The Denames is currently built on top of `@unstoppabledomain/resolution`, and added support for [DAS](https://da.systems) alongside with ENS, UNS, ZNS.
+The Denames is currently built on top of `@unstoppabledomain/resolution` version `v5.0.1`, and added support for [DAS](https://da.systems) alongside with ENS, UNS, ZNS.
 
 Denames introduced a method which will return a list of crypto addresses for the given chain:
 ```javascript
@@ -68,6 +68,8 @@ CKB address 1: ckb1qyq9j48k60dll8xjw04u2uu6vvd0fypqjkhqq84pmt, label: PersonalAd
 ```
 
 It will return an empty list `[]` when no records are set.
+
+> For other methods, please see [@unstoppabledomains/resolution API Reference](https://unstoppabledomains.github.io/resolution/)
 
 ### ENS support
 **Note: Ethereum Name Service requires installing additional packages 
