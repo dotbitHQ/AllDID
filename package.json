@@ -1,14 +1,14 @@
 {
-  "name": "@unstoppabledomains/resolution",
-  "version": "5.0.1",
-  "description": "Domain Resolution for blockchain domains",
+  "name": "denames",
+  "version": "1.1.0",
+  "description": "An all-in-one library to resolve decentralized accounts/domains",
   "main": "./build/index.js",
   "directories": {
     "doc": "docs"
   },
   "types": "./build/index.d.ts",
   "bin": {
-    "resolution": "./build/cli/cli.js"
+    "denames": "./build/cli/cli.js"
   },
   "scripts": {
     "release": "RELEASE=patch yarn release:run",
@@ -26,10 +26,10 @@
     "start": "npm run build:live",
     "dev": "yarn build && ./build/cli/cli.js -d brad.crypto",
     "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
-    "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
+    "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/denames",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
-    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
+    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:DeAccountSystems/denames.git docs) && git -C ./docs pull",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
@@ -46,9 +46,11 @@
   "author": "JohnnyJumper <https://github.com/JohnnyJumper>, Bogdan Gusiev <https://github.com/bogdan>, Braden Pezeshki <https://github.com/perfect-cents, Vladyslav Batyrenko <https://github.com/mvlabat>, Matthew Gould <https://github.com/theporpoise>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/unstoppabledomains/resolution.git"
+    "url": "https://github.com/DeAccountSystems/denames.git"
   },
   "keywords": [
+    "das",
+    ".bit",
     "cns",
     ".crypto",
     "zns",
@@ -63,9 +65,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unstoppabledomains/resolution.git"
+    "url": "https://github.com/DeAccountSystems/denames.git"
   },
-  "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
+  "homepage": "https://github.com/DeAccountSystems/denames.git",
   "devDependencies": {
     "@ensdomains/address-encoder": "0.2.6",
     "@ethersproject/providers": "^5.0.2",

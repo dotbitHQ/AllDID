@@ -52,9 +52,7 @@ import {
       `gets the domain name by hash from token metadata (only for UNS)`,
     )
     .option('--supported', `checks if the domain name is supported`)
-    .description(
-      'resolution cli exports main usage of @unstoppabledomains/resolution library',
-    );
+    .description('resolution cli exports main usage of denames library');
 
   // eslint-disable-next-line no-undef
   program.parse(process.argv);

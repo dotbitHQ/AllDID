@@ -1,30 +1,23 @@
-# Resolution
+# Denames
 
-[![NPM version](https://img.shields.io/npm/v/@unstoppabledomains/resolution.svg?style=flat)](https://www.npmjs.com/package/@unstoppabledomains/resolution)
-![CI](https://github.com/unstoppabledomains/resolution/workflows/CI/badge.svg?branch=master)
-[![Bundle Size Minified](https://img.shields.io/bundlephobia/min/@unstoppabledomains/resolution.svg)](https://bundlephobia.com/result?p=@unstoppabledomains/resolution)
-[![Bundle Size Minified Zipped](https://img.shields.io/bundlephobia/minzip/@unstoppabledomains/resolution.svg)](https://bundlephobia.com/result?p=@unstoppabledomains/resolution)
-[![Unstoppable Domains Documentation](https://img.shields.io/badge/Documentation-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
-[![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
+[![NPM version](https://img.shields.io/npm/v/denames.svg?style=flat)](https://www.npmjs.com/package/denames)
+![CI](https://github.com/DeAccountSystems/denames/workflows/CI/badge.svg?branch=master)
+[![Bundle Size Minified](https://img.shields.io/bundlephobia/min/denames.svg)](https://bundlephobia.com/result?p=denames)
+[![Bundle Size Minified Zipped](https://img.shields.io/bundlephobia/minzip/denames.svg)](https://bundlephobia.com/result?p=denames)
+[![Get help in Issues](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
-- [Installing Resolution](README.md#installing-resolution)
-- [Using Resolution](README.md#using-resolution)
+- [Installing Denames](README.md#installing-denames)
+- [Using Denames](README.md#using-denames)
 - [Default Ethereum Providers](README.md#default-ethereum-providers)
 - [Error Handling](README.md#error-handling)
 - [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
 
-Resolution is a library for interacting with blockchain domain names. It can be
-used to retrieve
-[payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses),
-IPFS hashes for
-[decentralized websites](https://unstoppabledomains.com/features#Build-Website),
-and GunDB usernames for
-[decentralized chat](https://unstoppabledomains.com/chat).
+Denames is a library for interacting with blockchain accounts and domains. It can be used to retrieve crypto addresses on blockchain, users social contacts and custom records. 
 
-Resolution is primarily built and maintained by
-[Unstoppable Domains](https://unstoppabledomains.com/).
+Denames supports decentralized accounts/domains across below zones:
 
-Resolution supports decentralized domains across three main zones:
+- Decentralized Account Systems(DAS)
+  - `.bit`
 
 - Zilliqa Name Service (ZNS)
   - `.zil`
@@ -47,8 +40,34 @@ Resolution supports decentralized domains across three main zones:
   - `.x`
   - ...
 
-For more information, see our detailed
-[API Referrence](https://unstoppabledomains.github.io/resolution/).
+### Background
+The Denames is currently built on top of `@unstoppabledomain/resolution`, and added support for [DAS](https://da.systems) alongside with ENS, UNS, ZNS.
+
+Denames introduced a method which will return a list of crypto addresses for the given chain:
+```javascript
+import { Resolution } from 'denames'
+
+const resolution = new Resolution()
+const account = 'dastodamoon.bit'
+
+resolution.addrList(account, 'ckb').then(records => {
+  console.log(`account ${account} has ${records.length} CKB address records as below:`)
+  
+  records.forEach((record, i) => {
+    const { key, value, label, ttl, avatar } = record
+    console.log(`CKB address ${i}: ${value}, label: ${label}, with a ttl ${ttl}`)
+  })
+})
+
+```
+output:
+```shell
+account dastodamoon.bit has 2 CKB address records as below:
+CKB address 0: ckb1qyqzeajw8xtqgvw0d6q8ey7sysvv7evxvwqqvnvmwu, label: BusinessAddress, with a ttl 300
+CKB address 1: ckb1qyq9j48k60dll8xjw04u2uu6vvd0fypqjkhqq84pmt, label: PersonalAddress, with a ttl 300
+```
+
+It will return an empty list `[]` when no records are set.
 
 ### ENS support
 **Note: Ethereum Name Service requires installing additional packages 
@@ -59,124 +78,68 @@ otherwise library throws error when trying to resolve ENS domain.**
 - `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
 - `"content-hash": "^2.5.2"`
 
-## Installing Resolution
+## Installing Denames
 
-Resolution can be installed with either `yarn` or `npm`.
+Denames can be installed with either `yarn` or `npm`.
 
 ```shell
-yarn add @unstoppabledomains/resolution
+yarn add denames
 ```
 
 ```shell
-npm install @unstoppabledomains/resolution --save
+npm install denames
 ```
 
 If you're interested in resolving domains via the command line, see our
 [CLI section](#command-line-interface).
 
-## Using Resolution
+## Using Denames
 
 Create a new project.
 
 ```shell
-mkdir resolution && cd $_
+mkdir denames && cd $_
 yarn init -y
-yarn add @unstoppabledomains/resolution
+yarn add denames
 ```
 
-### Look up a domain's crypto address
+### Look up account's crypto addresses
 
 Create a new file in your project, `address.js`.
 
 ```javascript
-const { default: Resolution } = require('@unstoppabledomains/resolution');
+const { Resolution } = require('denames');
 const resolution = new Resolution();
 
 function resolve(domain, currency) {
   resolution
-    .addr(domain, currency)
-    .then((address) => console.log(domain, 'resolves to', address))
+    .addrList(domain, currency)
+    .then((records) => console.log(domain, 'resolves to', records[0]?.value))
     .catch(console.error);
 }
 
-function resolveMultiChain(domain, currency, chain) {
-  resolution
-    .multiChainAddr(domain, currency, chain)
-    .then((address) => console.log(domain, 'resolves to', address, version))
-    .catch(console.error);
-}
-
-resolve('brad.crypto', 'ETH');
+resolve('dastodamoon.bit', 'CKB');
 resolve('brad.zil', 'ZIL');
-resolveMultiChain('brad.crypto', 'USDT', 'ERC20');
-resolveMultiChain('brad.crypto', 'USDT', 'OMNI');
 ```
 
 Execute the script.
 
 ```shell
 $ node address.js
-brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
+dastodamoon.bit resolves to ckb1qyqzeajw8xtqgvw0d6q8ey7sysvv7evxvwqqvnvmwu
 brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
-```
-
-### Find the IPFS hash for a decentralized website
-
-Create a new file in your project, `ipfs_hash.js`.
-
-```javascript
-const { default: Resolution } = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
-
-function resolveIpfsHash(domain) {
-  resolution
-    .ipfsHash(domain)
-    .then((hash) =>
-      console.log(
-        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
-      ),
-    )
-    .catch(console.error);
-}
-
-resolveIpfsHash('homecakes.crypto');
-```
-
-Execute the script.
-
-```shell
-$ node ipfs_hash.js
-You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv
-```
-
-### Find a custom record
-
-Create a new file in your project, `custom-resolution.js`.
-
-```javascript
-const { default: Resolution } = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
-
-function resolveCustomRecord(domain, record) {
-  resolution
-    .records(domain, [record])
-    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
-    .catch(console.error);
-}
-
-resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 ```
 
 ### Command Line Interface
 
-To use resolution via the command line install the package globally.
+To use denames via the command line install the package globally.
 
 ```shell
-yarn global add @unstoppabledomains/resolution
+yarn global add denames
 ```
 
 ```shell
-npm install -g @unstoppabledomains/resolution
+npm install -g denames
 ```
 
 By default, the CLI uses Infura as its primary gateway to the Ethereum
@@ -186,14 +149,14 @@ can do so using the `--ethereum-url` flag.
 For example:
 
 ```shell
-resolution --ethereum-url https://mainnet.infura.io/v3/${secret} -d udtestdev-usdt.crypto -a
+denames --ethereum-url https://mainnet.infura.io/v3/${secret} -d udtestdev-usdt.crypto -a
 ```
 
 Use the `-h` or `--help` flag to see all the available CLI options.
 
 ## Default Ethereum Providers
 
-Resolution provides zero-configuration experience by using built-in
+Denames provides zero-configuration experience by using built-in
 production-ready [Infura](http://infura.io/) endpoint by default.  
 Default Ethereum provider is free to use without restrictions and rate-limits
 for `CNS (.crypto domains)` resolution.  
@@ -212,7 +175,7 @@ To see all constructor options and factory methods check
 
 ## Autoconfiguration of blockchain network
 In some scenarios system might not be flexible enough to easy distinguish between various Ethereum testnets on compile time.
-For this case Resolution library provide a special async constructor which should be waited for 
+For this case Denames library provide a special async constructor which should be waited for 
 `await Resolution.autonetwork(options)`. This method makes a JSON RPC "net_version" call to the provider to get the network id.
 
 This method configures only Ens and Cns, Zns is supported only on Zilliqa mainnet which is going to be used in any cases.
@@ -225,7 +188,7 @@ await Resolution.autonetwork({
 ```
 ## Error Handling
 
-When resolution encounters an error it returns the error code instead of
+When denames encounters an error it returns the error code instead of
 stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
 
 ## Development
@@ -252,8 +215,8 @@ or **Linux shell**).
 4. Clone the repository
 
    ```bash
-   git clone https://github.com/unstoppabledomains/resolution.git
-   cd resolution
+   git clone https://github.com/DeAccountSystems/denames.git
+   cd denames
    ```
 
 5. Install dependencies
@@ -268,21 +231,6 @@ or **Linux shell**).
 - Supported keys: `$ yarn supported-keys:pull`
 - Both configs: `$ yarn config:pull`
 
-## Free advertising for integrated apps
-
-Once your app has a working Unstoppable Domains integration,
-[register it here](https://unstoppabledomains.com/app-submission). Registered
-apps appear on the Unstoppable Domains
-[homepage](https://unstoppabledomains.com/) and
-[Applications](https://unstoppabledomains.com/apps) page — putting your app in
-front of tens of thousands of potential customers per day.
-
-Also, every week we select a newly-integrated app to feature in the Unstoppable
-Update newsletter. This newsletter is delivered to straight into the inbox of
-~100,000 crypto fanatics — all of whom could be new customers to grow your
-business.
-
 ## Get help
 
-[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask
-questions.
+[Join our discord community](https://discord.gg/B7aa5fXq) and ask questions.
