@@ -33,7 +33,7 @@
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
-    "size": "yarn run sizecheck -p ./package.json -l 500 -v",
+    "size": "yarn run sizecheck -p ./package.json -l 600 -v",
     "config:pull": "yarn network-config:pull && yarn supported-keys:pull",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/uns-config.json -o src/config/uns-config.json",
     "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json",
