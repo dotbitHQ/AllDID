@@ -22,7 +22,9 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import {EthereumNetworks} from './utils';
-import {requireOrFail} from './utils/requireOrFail';
+import bip44constants from 'bip44-constants';
+import {formatsByCoinType} from '@ensdomains/address-encoder';
+import contentHash from 'content-hash';
 
 /**
  * @internal
@@ -245,16 +247,6 @@ export default class Ens extends NamingService {
   }
 
   protected getCoinType(currencyTicker: string): string {
-    const bip44constants = requireOrFail(
-      'bip44-constants',
-      'bip44-constants',
-      '^8.0.5',
-    );
-    const formatsByCoinType = requireOrFail(
-      '@ensdomains/address-encoder',
-      '@ensdomains/address-encoder',
-      '>= 0.1.x <= 0.2.x',
-    ).formatsByCoinType;
     const coin = bip44constants.findIndex(
       (item) =>
         item[1] === currencyTicker.toUpperCase() ||
@@ -312,11 +304,6 @@ export default class Ens extends NamingService {
     domain: string,
     coinType: string,
   ): Promise<string | undefined> {
-    const formatsByCoinType = requireOrFail(
-      '@ensdomains/address-encoder',
-      '@ensdomains/address-encoder',
-      '>= 0.1.x <= 0.2.x',
-    ).formatsByCoinType;
     const resolverContract = new EthereumContract(
       resolverInterface(resolver, coinType),
       resolver,
@@ -342,7 +329,6 @@ export default class Ens extends NamingService {
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {
-    const contentHash = requireOrFail('content-hash', 'content-hash', '^2.5.2');
     const nodeHash = this.namehash(domain);
     const resolverContract = await this.getResolverContract(domain);
     const contentHashEncoded = await this.callMethod(

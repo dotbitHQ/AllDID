@@ -2,6 +2,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from '../errors/configurationError';
 
+// todo: remove this function and replace it by a better solution
 /**
  * Function tries to require module and throw error if module is not found.
  * @param module - Module name or path
