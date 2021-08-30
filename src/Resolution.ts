@@ -700,7 +700,7 @@ export default class Resolution {
    * @param domain - domain name to be resolved
    * @param ticker - currency ticker like BTC, ETH, ZIL
    * @throws [[ResolutionError]] if address is not found
-   * @returns A promise that resolves in an address
+   * @returns DasAccountRecord[] A promise that resolves in an list of address object
    */
   async addrList(domain: string, ticker: string): Promise<DasAccountRecord[]> {
     domain = this.prepareDomain(domain);

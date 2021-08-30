@@ -44,16 +44,24 @@ Denames supports decentralized accounts/domains across below zones:
 The Denames is currently built on top of `@unstoppabledomain/resolution` version `v5.0.1`, and added support for [DAS](https://da.systems) alongside with ENS, UNS, ZNS.
 
 Denames introduced a method which will return a list of crypto addresses for the given chain:
-```javascript
+```typescript
 import { Resolution } from 'denames'
 
 const resolution = new Resolution()
 const account = 'dastodamoon.bit'
 
+interface DasAccountRecord {
+  ttl: number; // This will always be 0 for all accounts other than DAS
+  avatar: string; // This will always be empty string `''` for all accounts other than DAS
+  key: string; // This will always be the corresponding key for each account systems
+  label: string; // This will always be empty string `''` for all accounts other than DAS
+  value: string;
+}
+
 resolution.addrList(account, 'ckb').then(records => {
   console.log(`account ${account} has ${records.length} CKB address records as below:`)
   
-  records.forEach((record, i) => {
+  records.forEach((record: DasAccountRecord, i) => {
     const { key, value, label, ttl, avatar } = record
     console.log(`CKB address ${i}: ${value}, label: ${label}, with a ttl ${ttl}`)
   })
@@ -69,7 +77,7 @@ CKB address 1: ckb1qyq9j48k60dll8xjw04u2uu6vvd0fypqjkhqq84pmt, label: PersonalAd
 
 It will return an empty list `[]` when no records are set.
 
-> For other methods, please see [@unstoppabledomains/resolution API Reference](https://unstoppabledomains.github.io/resolution/)
+> For other methods from `@unstoppabledomain/resolution`, please see [@unstoppabledomains/resolution API Reference](https://unstoppabledomains.github.io/resolution/)
 
 ## Installing Denames
 
