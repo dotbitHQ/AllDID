@@ -71,15 +71,6 @@ It will return an empty list `[]` when no records are set.
 
 > For other methods, please see [@unstoppabledomains/resolution API Reference](https://unstoppabledomains.github.io/resolution/)
 
-### ENS support
-**Note: Ethereum Name Service requires installing additional packages 
-otherwise library throws error when trying to resolve ENS domain.**
-
-#### Required packages
-- `"bip44-constants": "^8.0.5"`
-- `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
-- `"content-hash": "^2.5.2"`
-
 ## Installing Denames
 
 Denames can be installed with either `yarn` or `npm`.
