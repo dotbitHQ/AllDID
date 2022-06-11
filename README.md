@@ -1,10 +1,10 @@
 # Denames
 
 [![NPM version](https://img.shields.io/npm/v/denames.svg?style=flat)](https://www.npmjs.com/package/denames)
-![CI](https://github.com/DeAccountSystems/denames/workflows/CI/badge.svg?branch=master)
+![CI](https://github.com/dotbitHQ/denames/workflows/CI/badge.svg?branch=master)
 [![Bundle Size Minified](https://img.shields.io/bundlephobia/min/denames.svg)](https://bundlephobia.com/result?p=denames)
 [![Bundle Size Minified Zipped](https://img.shields.io/bundlephobia/minzip/denames.svg)](https://bundlephobia.com/result?p=denames)
-[![Get help in Issues](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
+[![Get help in Issues](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/fVppR7z4ht)
 
 - [Installing Denames](README.md#installing-denames)
 - [Using Denames](README.md#using-denames)
@@ -12,7 +12,7 @@
 - [Error Handling](README.md#error-handling)
 - [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
 
-Denames is a library for interacting with blockchain accounts and domains. It can be used to retrieve crypto addresses on blockchain, users social contacts and custom records. 
+Denames is a library to interact with Web3 accounts and domains. It can be used to retrieve crypto addresses on blockchain, users social contacts and custom records. 
 
 Denames supports decentralized accounts/domains across below zones:
 
@@ -225,7 +225,7 @@ or **Linux shell**).
 4. Clone the repository
 
    ```bash
-   git clone https://github.com/DeAccountSystems/denames.git
+   git clone https://github.com/dotbitHQ/denames.git
    cd denames
    ```
 
