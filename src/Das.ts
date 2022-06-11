@@ -1,7 +1,12 @@
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import {NamingService} from './NamingService';
-import {DasAccountCell, DasAccountData, DasAccountRecord} from './types/DAS';
+import {
+  DasAccountCell,
+  DasAccountData,
+  DasAccountRecord,
+  DotBitAccountRecordsRes,
+} from './types/DAS';
 import {DasSource, NamingServiceName, Provider} from './types/publicTypes';
 import {constructRecords} from './utils';
 
@@ -10,8 +15,8 @@ import {constructRecords} from './utils';
  */
 export default class Das extends NamingService {
   static readonly UrlMap = {
-    mainnet: 'https://indexer.da.systems',
-    lina: 'https://indexer.da.systems', // the current version of mainnet
+    mainnet: 'https://indexer-v1.did.id',
+    mirana: 'https://indexer-v1.did.id', // the current version of mainnet
   };
 
   readonly name = NamingServiceName.DAS;
@@ -56,7 +61,16 @@ export default class Das extends NamingService {
       });
     }
 
-    return account.owner_address;
+    return account.owner_key;
+  }
+
+  private async _records(account: string) {
+    const response = (await this.provider.request({
+      method: 'das_accountRecords',
+      params: [{account}],
+    })) as {data: DotBitAccountRecordsRes};
+
+    return response?.data?.records;
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -84,8 +98,10 @@ export default class Das extends NamingService {
 
     const dasKeys = keys.map((key) => this.fromUDRecordNameToDAS(key));
 
+    const records = await this._records(domain);
+
     const recordList = dasKeys.map((key) => {
-      const record = account.records.find((record) => record.key === key);
+      const record = records.find((record) => record.key === key);
 
       return record?.value;
     });
@@ -146,7 +162,9 @@ export default class Das extends NamingService {
       });
     }
 
-    return account.records.reduce((all, record) => {
+    const records = await this._records(domain);
+
+    return records.reduce((all, record) => {
       all[record.key] = all[record.value] || record.value;
       return all;
     }, {});
@@ -182,11 +200,11 @@ export default class Das extends NamingService {
   /* added for DAS only */
   async account(account: string): Promise<DasAccountData> {
     const response = (await this.provider.request({
-      method: 'das_searchAccount',
-      params: [account],
+      method: 'das_accountInfo',
+      params: [{account}],
     })) as {data: DasAccountCell};
 
-    return response?.data?.account_data;
+    return response?.data?.account_info;
   }
 
   async recordList(account: string, key: string): Promise<DasAccountRecord[]> {
@@ -198,13 +216,15 @@ export default class Das extends NamingService {
       });
     }
 
-    return accountData.records
+    const records = await this._records(account);
+
+    return records
       .filter((record) => record.key === key)
       .map((record) => {
         return {
           ...record,
           ttl: Number(record.ttl),
-          avatar: `https://identicons.da.systems/identicon/${account}`,
+          avatar: `https://display.did.id/identicon/${account}`,
         };
       });
   }

@@ -18,20 +18,18 @@ export interface DasAccountRecord extends Omit<DasRecord, 'ttl'> {
   avatar: string;
 }
 
-export interface DasAccountData<T = DasRecord> {
+export interface DasAccountData {
   account: string; // abc.bit
   account_id_hex: string; // 0x1234...
   next_account_id_hex: string; // 0x1234...
   create_at_unix: number; // seconds
   expired_at_unix: number; // seconds
   status: number; // 0
-  owner_lock_args_hex: string; // '0x1234...'
-  owner_address: string;
-  owner_address_chain: string;
-  manager_lock_args_hex: string; // '0x1234...'
-  manager_address: string;
-  manager_address_chain: string;
-  records: T[];
+  das_lock_arg_hex: string;
+  owner_algorithm_id: number; // 3: eth personal sign, 4: tron sign, 5: eip-712
+  manager_algorithm_id: number;
+  owner_key: string;
+  manager_key: string;
 }
 
 export interface DasAccountCell<T = DasRecord> {
@@ -39,5 +37,10 @@ export interface DasAccountCell<T = DasRecord> {
     tx_hash: string;
     index: number;
   };
-  account_data: DasAccountData<T>;
+  account_info: DasAccountData;
+}
+
+export interface DotBitAccountRecordsRes {
+  account: string;
+  records: DasRecord[];
 }

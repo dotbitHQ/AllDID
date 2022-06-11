@@ -14,7 +14,7 @@ import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3/lib/web3/httpprovider';
 import Networking from '../utils/Networking';
-import {jsonRpcResponse} from './Das.test';
+import {dotbitAccountRPCRes} from './Das.test';
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
@@ -1250,7 +1250,7 @@ describe('Resolution', () => {
     it('multiple address for .bit', async () => {
       const eyes = mockAsyncMethod(Networking, 'fetch', {
         status: 200,
-        json: () => jsonRpcResponse,
+        json: () => dotbitAccountRPCRes,
       });
 
       const addrs = await resolution.addrList('dastodamoon.bit', 'ckb');
@@ -1265,7 +1265,7 @@ describe('Resolution', () => {
     it('empty address for .bit', async () => {
       const eyes = mockAsyncMethod(Networking, 'fetch', {
         status: 200,
-        json: () => jsonRpcResponse,
+        json: () => dotbitAccountRPCRes,
       });
 
       const addrs = await resolution.addrList('dastodamoon.bit', 'bnb');

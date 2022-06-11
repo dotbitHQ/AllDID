@@ -16,7 +16,7 @@ Denames is a library for interacting with blockchain accounts and domains. It ca
 
 Denames supports decentralized accounts/domains across below zones:
 
-- Decentralized Account Systems(DAS)
+- .bit (Previously DAS)
   - `.bit`
 
 - Zilliqa Name Service (ZNS)
@@ -41,7 +41,7 @@ Denames supports decentralized accounts/domains across below zones:
   - ...
 
 ### Background
-The Denames is currently built on top of `@unstoppabledomain/resolution` version `v5.0.1`, and added support for [DAS](https://da.systems) alongside with ENS, UNS, ZNS.
+The Denames is currently built on top of `@unstoppabledomain/resolution` version `v5.0.1`, and added support for [.bit](https://did.id) alongside with ENS, UNS, ZNS.
 
 Denames introduced a method which will return a list of crypto addresses for the given chain:
 ```typescript
@@ -51,11 +51,11 @@ const resolution = new Resolution()
 const account = 'dastodamoon.bit'
 
 interface DasAccountRecord {
-  ttl: number; // This will always be 0 for all accounts other than DAS
-  avatar: string; // This will always be empty string `''` for all accounts other than DAS
   key: string; // This will always be the corresponding key for each account systems
-  label: string; // This will always be empty string `''` for all accounts other than DAS
   value: string;
+  label: string; // This will always be empty string `''` for all accounts other than .bit
+  ttl: number; // This will always be 0 for all accounts other than .bit
+  avatar: string; // This will always be empty string `''` for all accounts other than .bit
 }
 
 resolution.addrList(account, 'ckb').then(records => {
@@ -108,14 +108,14 @@ yarn add denames
 
 Create a new file in your project, `address.js`.
 
-> It is recommended that developers set up their own [DAS Indexer](https://github.com/DeAccountSystems/das_account_indexer), see [das-sdk-js](https://github.com/DeAccountSystems/das-sdk-js#configuration) for details.
+> It is recommended that developers set up their own [.bit Indexer](https://github.com/dotbitHQ/das-account-indexer), see [.bit Backend Integration](https://docs.did.id/developers/integration-backend#das-account-indexer) for details.
 
 ```javascript
 const { Resolution } = require('denames');
 const resolution = new Resolution({
   sourceConfig: {
     das: {
-      url: 'https://indexer.da.systems', // DAS indexer JSON-RPC endpoint. You can use the indexer provided by DAS team for test.
+      url: 'https://indexer-v1.did.id', // .bit indexer JSON-RPC endpoint. You can use the indexer provided by .bit team for test.
       network: 'mainnet',
     }
   }
