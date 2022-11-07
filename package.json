@@ -1,0 +1,61 @@
+{
+  "name": "dename",
+  "version": "0.0.1",
+  "description": "The all-in-one DID SDK, resolving all decentralized name(Web3 Name).",
+  "author": "Jeff Jing <https://github.com/zgayjjf>",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "module": "lib.esm/index.js",
+  "types": "src/index.ts",
+  "publishConfig": {
+    "types": "lib/index.d.ts"
+  },
+  "scripts": {
+    "test": "jest",
+    "clear": "rm -rf ./lib/ ./lib.esm/",
+    "build": "npm run clear && npm run build:esm & npm run build:commonjs",
+    "build:commonjs": "tsc -p tsconfig.build.json",
+    "build:esm": "tsc -p tsconfig.build.esm.json",
+    "dev:browser": "npm run build && vite ./example/browser",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "dotbit",
+    ".bit",
+    "DID",
+    "Decentralized Identity",
+    "web3",
+    "blockchain",
+    "ENS",
+    "unstoppabledomains",
+    "PNS",
+    "SNS",
+    "SpaceID",
+    "Flowns"
+  ],
+  "files": [
+    "lib",
+    "lib.esm"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dotbitHQ/denames.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dotbitHQ/denames/issues"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.2",
+    "@types/node": "^18.0.0",
+    "eslint": "8.22.0",
+    "eslint-config-blockabc": "^0.15.2",
+    "eslint-plugin-n": "^15.3.0",
+    "jest": "^28.1.1",
+    "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.14"
+  },
+  "dependencies": {
+  }
+}
