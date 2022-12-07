@@ -1,5 +1,5 @@
 {
-  "name": "dename",
+  "name": "alldid",
   "version": "0.0.1",
   "description": "The all-in-one DID SDK, resolving all decentralized name(Web3 Name).",
   "author": "Jeff Jing <https://github.com/zgayjjf>",
@@ -57,5 +57,7 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
+    "@ensdomains/ensjs": "^2.1.0",
+    "dotbit": "^0.4.13"
   }
 }
