@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { AllDID } from './AllDID'
 import { DotbitService, DotbitServiceOptions } from './services/DotbitService'
-import { EnsService, EnsServiceOptions } from './services/EnsService'
+import { EnsService, ensServiceOptions, EnsServiceOptions } from '@alldid/service-ens'
 
 export interface CreateInstanceOptions {
   'dotbit': DotbitServiceOptions,
@@ -11,10 +11,7 @@ export interface CreateInstanceOptions {
 
 export const defaultCreateInstanceOptions: CreateInstanceOptions = {
   dotbit: undefined,
-  ens: {
-    provider: new ethers.providers.JsonRpcProvider('https://web3.ens.domains/v1/mainnet'),
-    networkId: '1',
-  },
+  ens: ensServiceOptions,
   sid: {
     // from https://github.com/Space-ID/sidjs/blob/master/src/constants/rpc.js
     provider: new ethers.providers.JsonRpcProvider('https://bsc-mainnet.nodereal.io/v1/d0c3ef1cdb0247f4b6fae228aa76c8b8'),

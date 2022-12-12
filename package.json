@@ -57,7 +57,7 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^2.1.0",
+    "@alldid/service-ens": "workspace:^0.0.1",
     "dotbit": "^0.4.13"
   }
 }
