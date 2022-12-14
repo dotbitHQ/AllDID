@@ -8,15 +8,15 @@ import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/co
 import { abi as ResolverContract } from '@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json'
 
 export interface EnsServiceOptions {
-  provider: Provider | ExternalProvider,
-  networkId: string,
+  provider: Provider | ExternalProvider
+  networkId: string
 }
 
-function getRegistrarContract({ address, provider }) {
+function getRegistrarContract ({ address, provider }) {
   return new ethers.Contract(address, RegistrarContract, provider)
 }
 
-function getResolverContract({ address, provider }) {
+function getResolverContract ({ address, provider }) {
   return new ethers.Contract(address, ResolverContract, provider)
 }
 
@@ -58,39 +58,39 @@ function getResolverAddress (networkId: string) {
 
 function getTextRecordKeys () {
   return [
-    "email",
-    "url",
-    "avatar",
-    "description",
-    "notice",
-    "keywords",
-    "com.discord",
-    "com.github",
-    "com.reddit",
-    "com.twitter",
-    "org.telegram",
-    "eth.ens.delegate"
+    'email',
+    'url',
+    'avatar',
+    'description',
+    'notice',
+    'keywords',
+    'com.discord',
+    'com.github',
+    'com.reddit',
+    'com.twitter',
+    'org.telegram',
+    'eth.ens.delegate'
   ]
 }
 
 function getAddrRecordKeys () {
-  return [
-    "ETH",
-    "BTC",
-    "LTC",
-    "DOGE"
-  ]
+  return ['ETH', 'BTC', 'LTC', 'DOGE']
 }
 
-async function batchRequest (reqArray: any[], callback: (res: any) => void): Promise<any> {
+async function batchRequest (
+  reqArray: any[],
+  callback: (res: any) => void
+): Promise<any> {
   const BatchRequest = new Web3().BatchRequest
   const batch = new BatchRequest()
-  const promises = reqArray.map((call) => {
+  const promises = reqArray.map(call => {
     return new Promise((resolve, reject) => {
-      call.then(res => {
-        callback(res)
-        resolve(null)
-      }).catch(err => reject(err))
+      call
+        .then(res => {
+          callback(res)
+          resolve(null)
+        })
+        .catch(err => reject(err))
       batch.add(call)
     })
   })
@@ -106,9 +106,18 @@ export class EnsService extends NamingService {
   ensResolver: Contract
   constructor (options: EnsServiceOptions) {
     super()
-    this.ens = new ENS({ provider: options.provider, ensAddress: getEnsAddress(options.networkId) })
-    this.ensRegisterar = getRegistrarContract({ provider: options.provider, address: getRegistrarAddress(options.networkId) })
-    this.ensResolver = getResolverContract({ provider: options.provider, address: getResolverAddress(options.networkId) })
+    this.ens = new ENS({
+      provider: options.provider,
+      ensAddress: getEnsAddress(options.networkId)
+    })
+    this.ensRegisterar = getRegistrarContract({
+      provider: options.provider,
+      address: getRegistrarAddress(options.networkId)
+    })
+    this.ensResolver = getResolverContract({
+      provider: options.provider,
+      address: getResolverAddress(options.networkId)
+    })
   }
 
   isSupported (name: string): boolean {
@@ -116,11 +125,13 @@ export class EnsService extends NamingService {
   }
 
   isRegistered (name: string): Promise<boolean> {
-    return this.isSupported ? this.owner(name).then((owner) => !!owner) : null
+    return this.isSupported ? this.owner(name).then(owner => !!owner) : null
   }
 
   isAvailable (name: string): Promise<boolean> {
-    return this.isSupported ? this.isRegistered(name).then(isRegistered => !isRegistered) : null
+    return this.isSupported
+      ? this.isRegistered(name).then(isRegistered => !isRegistered)
+      : null
   }
 
   async owner (name: string): Promise<string> {
@@ -146,19 +157,22 @@ export class EnsService extends NamingService {
   async record (name: string, key: string): Promise<RecordItem> {
     if (!this.isSupported(name)) return
     const ensName = this.ens.name(name)
-    let keyArray = key.split('.'), type = keyArray[0], subtype = keyArray.length > 1 ? keyArray[keyArray.length - 1] : '', value
+    let keyArray = key.split('.'),
+      type = keyArray[0],
+      subtype = keyArray.length > 1 ? keyArray[keyArray.length - 1] : '',
+      value
     if (type === 'address') {
-      value  = await ensName.getAddress(subtype)
+      value = await ensName.getAddress(subtype)
     } else {
-      value  = await ensName.getText(subtype)
+      value = await ensName.getText(subtype)
     }
     return Promise.resolve({
       key,
       type,
       subtype,
-      label: '', 
+      label: '',
       value,
-      ttl: 0,
+      ttl: 0
     })
   }
 
@@ -172,14 +186,22 @@ export class EnsService extends NamingService {
     return recordArray
   }
 
-  async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
+  async addrs (
+    name: string,
+    keys?: string | string[]
+  ): Promise<RecordItemAddr[]> {
     if (!this.isSupported(name)) return
     let recordItemAddrArray = []
     if (!keys) {
       keys = getAddrRecordKeys().map(key => `address.${key}`)
-    } 
+    }
     if (Array.isArray(keys)) {
-      recordItemAddrArray.push(await this.records(name, keys.map(key => `address.${key}`)))
+      recordItemAddrArray.push(
+        await this.records(
+          name,
+          keys.map(key => `address.${key}`)
+        )
+      )
     } else {
       recordItemAddrArray.push(await this.record(name, `address.${keys}`))
     }
@@ -197,11 +219,14 @@ export class EnsService extends NamingService {
   }
 
   async dwebs (name: string, keys?: string | string[]): Promise<string[]> {
-    let contentHash = await this.dweb(name);
+    let contentHash = await this.dweb(name)
     return [contentHash]
   }
 
-  async reverse (address: string, currencyTicker: string): Promise<string | null> {
+  async reverse (
+    address: string,
+    currencyTicker: string
+  ): Promise<string | null> {
     const name = await this.ens.getName(address)
     if (!this.isSupported(name)) return
     return this.ens.name(name).getAddress(currencyTicker)
