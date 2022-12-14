@@ -56,12 +56,10 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
-    "@ensdomains/ens": "^0.6.2",
     "@ensdomains/ens-contracts": "^0.0.15",
     "@ensdomains/ensjs": "^2.1.0",
     "@ethersproject/providers": "^5.7.2",
     "@siddomains/sidjs": "^0.1.17",
-    "bignumber.js": "^9.1.1",
     "dotbit": "^0.4.13",
     "ethers": "^5.7.2",
     "web3": "^1.8.1"

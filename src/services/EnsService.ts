@@ -4,7 +4,6 @@ import Web3 from 'web3'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
-import { abi as ResolverContract } from '@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider
@@ -13,10 +12,6 @@ export interface EnsServiceOptions {
 
 function getRegistrarContract ({ address, provider }) {
   return new ethers.Contract(address, RegistrarContract, provider)
-}
-
-function getResolverContract ({ address, provider }) {
-  return new ethers.Contract(address, ResolverContract, provider)
 }
 
 // from https://github.com/Space-ID/sidjs/blob/master/src/index.js#L16
@@ -102,7 +97,6 @@ export class EnsService extends NamingService {
 
   ens: ENS
   ensRegisterar: Contract
-  ensResolver: Contract
   constructor (options: EnsServiceOptions) {
     super()
     this.ens = new ENS({
@@ -112,10 +106,6 @@ export class EnsService extends NamingService {
     this.ensRegisterar = getRegistrarContract({
       provider: options.provider,
       address: getRegistrarAddress(options.networkId)
-    })
-    this.ensResolver = getResolverContract({
-      provider: options.provider,
-      address: getResolverAddress(options.networkId)
     })
   }
 
