@@ -1,7 +1,6 @@
-import ENS, { labelhash, namehash } from '@ensdomains/ensjs'
-import { ethers, Contract, utils } from 'ethers'
+import ENS, { labelhash } from '@ensdomains/ensjs'
+import { ethers, Contract } from 'ethers'
 import Web3 from 'web3'
-import { BigNumber } from 'bignumber.js'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
@@ -148,12 +147,12 @@ export class EnsService extends NamingService {
   tokenId (name: string): Promise<string> {
     if (!this.isSupported(name)) return
     const nameArray = name.split('.')
-    const label = nameArray[nameArray.length - 1]
-    const tokenID: string = new BigNumber(labelhash(label)).toString(16)
-    return Promise.resolve('0x' + tokenID)
+    const label = nameArray[0]
+    const tokenID: string = labelhash(label) + ''
+    return Promise.resolve(tokenID)
   }
 
-  // key: type.subtype -> 'address.60','text.email'
+  // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem> {
     if (!this.isSupported(name)) return
     const ensName = this.ens.name(name)
