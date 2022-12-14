@@ -158,8 +158,8 @@ export class EnsService extends NamingService {
     if (!this.isSupported(name)) return
     const ensName = this.ens.name(name)
     let keyArray = key.split('.'),
-      type = keyArray[0],
-      subtype = keyArray.length > 1 ? keyArray[keyArray.length - 1] : '',
+      type = keyArray.length > 1 ? keyArray[0] : '',
+      subtype = keyArray[keyArray.length - 1],
       value
     if (type === 'address') {
       value = await ensName.getAddress(subtype)
@@ -191,26 +191,34 @@ export class EnsService extends NamingService {
     keys?: string | string[]
   ): Promise<RecordItemAddr[]> {
     if (!this.isSupported(name)) return
-    let recordItemAddrArray = []
     if (!keys) {
-      keys = getAddrRecordKeys().map(key => `address.${key}`)
+      keys = getAddrRecordKeys()
     }
     if (Array.isArray(keys)) {
-      recordItemAddrArray.push(
-        await this.records(
-          name,
-          keys.map(key => `address.${key}`)
-        )
+      let records = await this.records(
+        name,
+        keys.map(key => `address.${key}`)
       )
+      return records.map(record => ({
+        ...record,
+        symbol: record.key.split('.')[1].toUpperCase()
+      }))
     } else {
-      recordItemAddrArray.push(await this.record(name, `address.${keys}`))
+      let record = await this.record(name, `address.${keys}`)
+      return [{
+        ...record,
+        symbol: keys.toUpperCase()
+      }]
     }
-    return recordItemAddrArray
   }
 
-  addr (name: string): Promise<RecordItemAddr> {
+  async addr (name: string): Promise<RecordItemAddr> {
     if (!this.isSupported(name)) return
-    return this.ens.name(name).getAddress()
+    let symbol = 'ETH'
+    return {
+      ...await this.record(name, `address.${symbol}`),
+      symbol
+    }
   }
 
   dweb (name: string): Promise<string> {
