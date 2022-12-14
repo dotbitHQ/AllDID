@@ -1,6 +1,6 @@
 import ENS from '@ensdomains/ensjs'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
-import { NamingService } from './NamingService'
+import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider,
@@ -56,19 +56,19 @@ export class EnsService extends NamingService {
     return null
   }
 
-  record (name: string, key: string): Promise<string> {
+  record (name: string, key: string): Promise<RecordItem> {
     return null
   }
 
-  records (name: string, keys?: string[]): Promise<Record<string, string>> {
+  records (name: string, keys?: string[]): Promise<RecordItem[]> {
     return null
   }
 
-  addrs (name: string, keys?: string | string[]): Promise<string> {
+  addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     return null
   }
 
-  addr (name: string): Promise<string> {
+  addr (name: string): Promise<RecordItemAddr> {
     return null
   }
 

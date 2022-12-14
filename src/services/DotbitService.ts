@@ -1,5 +1,5 @@
 import { createInstance, DotBit, isSupportedAccount } from 'dotbit'
-import { NamingService } from './NamingService'
+import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 
 export type DotbitServiceOptions = any // todo: export config interface from dotbit.js
 
@@ -36,19 +36,19 @@ export class DotbitService extends NamingService {
     return null
   }
 
-  record (name: string, key: string): Promise<string> {
+  record (name: string, key: string): Promise<RecordItem> {
     return null
   }
 
-  records (name: string, keys?: string[]): Promise<Record<string, string>> {
+  records (name: string, keys?: string[]): Promise<RecordItem[]> {
     return null
   }
 
-  addrs (name: string, keys?: string | string[]): Promise<string> {
+  addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     return null
   }
 
-  addr (name: string): Promise<string> {
+  addr (name: string): Promise<RecordItemAddr> {
     return null
   }
 
