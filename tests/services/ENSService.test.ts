@@ -28,6 +28,11 @@ describe('ENSService', () => {
       expect(owner).toMatch(/^0x[0-9A-Fa-f]{40}$/)
     })
 
+    it('tokenId that owner of leon.eth is valid', async () => {
+      const tokenId = await ensService.tokenId('leon.eth')
+      expect(tokenId).toMatch(/^0x[0-9A-Fa-f]{64}$/)
+    })
+
     it("leont.eth's text record", async () => {
       const record = await ensService.record('leont.eth', 'text.keywords')
       expect(record).toEqual({

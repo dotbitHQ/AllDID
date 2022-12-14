@@ -61,7 +61,6 @@
     "@ethersproject/providers": "^5.7.2",
     "@siddomains/sidjs": "^0.1.17",
     "dotbit": "^0.4.13",
-    "ethers": "^5.7.2",
-    "web3": "^1.8.1"
+    "ethers": "^5.7.2"
   }
 }
