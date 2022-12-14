@@ -1,6 +1,5 @@
 import ENS, { labelhash } from '@ensdomains/ensjs'
 import { ethers, Contract } from 'ethers'
-import Web3 from 'web3'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
@@ -40,16 +39,6 @@ function getRegistrarAddress (networkId: string) {
   // .bnb bsc mainnet
 }
 
-function getResolverAddress (networkId: string) {
-  // .bnb bsc testnet
-
-  // ens
-  if ([1, 3, 4, 5].includes(parseInt(networkId))) {
-    return '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41'
-  }
-  // .bnb bsc mainnet
-}
-
 function getTextRecordKeys () {
   return [
     'email',
@@ -69,27 +58,6 @@ function getTextRecordKeys () {
 
 function getAddrRecordKeys () {
   return ['ETH', 'BTC', 'LTC', 'DOGE']
-}
-
-async function batchRequest (
-  reqArray: any[],
-  callback: (res: any) => void
-): Promise<any> {
-  const BatchRequest = new Web3().BatchRequest
-  const batch = new BatchRequest()
-  const promises = reqArray.map(call => {
-    return new Promise((resolve, reject) => {
-      call
-        .then(res => {
-          callback(res)
-          resolve(null)
-        })
-        .catch(err => reject(err))
-      batch.add(call)
-    })
-  })
-  batch.execute()
-  await Promise.all(promises)
 }
 
 export class EnsService extends NamingService {
@@ -168,11 +136,10 @@ export class EnsService extends NamingService {
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     if (!this.isSupported(name)) return
     if (!keys) keys = getTextRecordKeys().map(key => `text.${key}`)
-    const recordArray = []
-    const requestArray = []
+    const requestArray: Array<Promise<RecordItem>> = []
     keys.forEach(key => requestArray.push(this.record(name, key)))
-    await batchRequest(requestArray, record => recordArray.push(record))
-    return recordArray
+    // await batchRequest(requestArray, record => recordArray.push(record))
+    return Promise.all<RecordItem>(requestArray)
   }
 
   async addrs (
