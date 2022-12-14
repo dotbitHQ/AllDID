@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { AllDID } from './AllDID'
 import { DotbitService, DotbitServiceOptions } from './services/DotbitService'
 import { EnsService, EnsServiceOptions } from './services/EnsService'
+import { SIDService } from './services/SIDService'
 
 export interface CreateInstanceOptions {
   'dotbit': DotbitServiceOptions,
@@ -22,11 +23,11 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
   }
 }
 
-export function createInstance (options: CreateInstanceOptions) {
+export function createInstance (options = defaultCreateInstanceOptions) {
   const alldid = new AllDID()
   const dotbitService = new DotbitService(options.dotbit)
   const ensService = new EnsService(options.ens)
-  const sidService = new DotbitService(options.sid)
+  const sidService = new SIDService(options.sid)
 
   alldid.installService(dotbitService)
   alldid.installService(ensService)

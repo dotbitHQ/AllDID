@@ -3,7 +3,7 @@ import { ethers, Contract, utils } from 'ethers'
 import Web3 from 'web3'
 import { BigNumber } from 'bignumber.js'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
-import { NamingService } from './NamingService'
+import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
 import { abi as ResolverContract } from '@ensdomains/ens-contracts/artifacts/contracts/resolvers/PublicResolver.sol/PublicResolver.json'
 
@@ -54,6 +54,32 @@ function getResolverAddress (networkId: string) {
     return '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41'
   }
   // .bnb bsc mainnet
+}
+
+function getTextRecordKeys () {
+  return [
+    "email",
+    "url",
+    "avatar",
+    "description",
+    "notice",
+    "keywords",
+    "com.discord",
+    "com.github",
+    "com.reddit",
+    "com.twitter",
+    "org.telegram",
+    "eth.ens.delegate"
+  ]
+}
+
+function getAddrRecordKeys () {
+  return [
+    "ETH",
+    "BTC",
+    "LTC",
+    "DOGE"
+  ]
 }
 
 async function batchRequest (reqArray: any[], callback: (res: any) => void): Promise<any> {
@@ -116,37 +142,51 @@ export class EnsService extends NamingService {
     return Promise.resolve('0x' + tokenID)
   }
 
-  record (name: string, key: string): Promise<string> {
+  // key: type.subtype -> 'address.60','text.email'
+  async record (name: string, key: string): Promise<RecordItem> {
     if (!this.isSupported(name)) return
-    return this.ens.name(name).getText(key)
-  }
-
-  async records (name: string, keys?: string[]): Promise<Record<string, string>> {
-    if (!this.isSupported(name)) return
-    if (!keys) return
-    const recordObject = {}
-    const requestArray = []
-    const node = namehash(name)
-    keys.forEach(key => requestArray.push(this.ensResolver.text(node, key).then(value => [key, value])))
-    await batchRequest(requestArray, (res) => (recordObject[res[0]] = res[1]))
-    return recordObject
-  }
-
-  async addrs (name: string, keys?: string | string[]): Promise<string> {
-    if (!this.isSupported(name)) return
-    if (!keys) return
-    if (typeof keys === 'string') {
-      return this.ens.name(name).getAddress(keys)
+    const ensName = this.ens.name(name)
+    let keyArray = key.split('.'), type = keyArray[0], subtype = keyArray.length > 1 ? keyArray[keyArray.length - 1] : '', value
+    if (type === 'address') {
+      value  = await ensName.getAddress(subtype)
+    } else {
+      value  = await ensName.getText(subtype)
     }
-    const node = namehash(name)
-    const addrsObject = {}
-    const requestArray = []
-    keys.forEach(key => requestArray.push(this.ensResolver.addr(node, key).then(value => [key, value])))
-    await batchRequest(requestArray, (res) => (addrsObject[res[0]] = res[1]))
-    return Object.values(addrsObject).join(',')
+    return Promise.resolve({
+      key,
+      type,
+      subtype,
+      label: '', 
+      value,
+      ttl: 0,
+    })
   }
 
-  addr (name: string): Promise<string> {
+  async records (name: string, keys?: string[]): Promise<RecordItem[]> {
+    if (!this.isSupported(name)) return
+    if (!keys) keys = getTextRecordKeys().map(key => `text.${key}`)
+    const recordArray = []
+    const requestArray = []
+    keys.forEach(key => requestArray.push(this.record(name, key)))
+    await batchRequest(requestArray, record => recordArray.push(record))
+    return recordArray
+  }
+
+  async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
+    if (!this.isSupported(name)) return
+    let recordItemAddrArray = []
+    if (!keys) {
+      keys = getAddrRecordKeys().map(key => `address.${key}`)
+    } 
+    if (Array.isArray(keys)) {
+      recordItemAddrArray.push(await this.records(name, keys.map(key => `address.${key}`)))
+    } else {
+      recordItemAddrArray.push(await this.record(name, `address.${keys}`))
+    }
+    return recordItemAddrArray
+  }
+
+  addr (name: string): Promise<RecordItemAddr> {
     if (!this.isSupported(name)) return
     return this.ens.name(name).getAddress()
   }
@@ -156,8 +196,9 @@ export class EnsService extends NamingService {
     return this.ens.name(name).getContent()
   }
 
-  dwebs (name: string, keys?: string | string[]): Promise<string> {
-    return null
+  async dwebs (name: string, keys?: string | string[]): Promise<string[]> {
+    let contentHash = await this.dweb(name);
+    return [contentHash]
   }
 
   async reverse (address: string, currencyTicker: string): Promise<string | null> {
