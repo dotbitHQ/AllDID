@@ -128,14 +128,14 @@ export class EnsService extends NamingService {
     else {
       value = await ensName.getText(subtype)
     }
-    return await Promise.resolve({
+    return {
       key,
       type,
       subtype,
       label: '',
       value,
       ttl: 0,
-    })
+    }
   }
 
   records (name: string, keys?: string[]): Promise<RecordItem[]> {
