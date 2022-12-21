@@ -8,6 +8,7 @@ import {
   DefaultConfig,
 } from 'dotbit'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
+import { formatsByName } from '@ensdomains/address-encoder'
 import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
 
 // todo: export config interface from dotbit.js
@@ -121,11 +122,19 @@ export class DotbitService extends NamingService {
     return dwebs.map(dweb => (`${dweb.value}`))
   }
 
-  reverse (address: string, currencyTicker: string): Promise<string | null> {
-    return null
+  async reverse (address: string, currencyTicker: string): Promise<string | null> {
+    const format = formatsByName[currencyTicker]
+    console.log(currencyTicker, format)
+    const keyInfo = {
+      coinType: format.coinType,
+      key: address,
+    }
+    const bitAccount = await this.dotbit.reverse(keyInfo)
+    return bitAccount?.account
   }
 
   registryAddress (name: string): Promise<string> {
+    this.throwError('Unsupported Method', AllDIDErrorCode.RecordIsNotFound)
     return null
   }
 }

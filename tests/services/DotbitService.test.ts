@@ -67,5 +67,11 @@ describe('DotbitService', () => {
         ['QmcGV8fimB7aeBxnDqr7bSSLUWLeyFKUukGqDhWnvriQ3T'],
       )
     })
+
+    it('0xc72b6f66017246d6a7f159f5c2bf358188ad9eca\'s reverse is valid', async () => {
+      expect((await dotbitService.reverse('0xc72b6f66017246d6a7f159f5c2bf358188ad9eca', 'BNB'))).toEqual(
+        'leonx.bit',
+      )
+    })
   })
 })
