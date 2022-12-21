@@ -1,8 +1,10 @@
 import ENS, { labelhash } from '@ensdomains/ensjs'
+import { formatsByName, formatsByCoinType } from "@ensdomains/address-encoder"
 import { ethers, Contract } from 'ethers'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
+import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider,
@@ -49,21 +51,24 @@ function getTextRecordKeys (): string[] {
     'email',
     'url',
     'avatar',
-    'description',
-    'notice',
-    'keywords',
     'com.discord',
     'com.github',
-    'com.reddit',
     'com.twitter',
     'org.telegram',
-    'eth.ens.delegate',
   ]
 }
 
 function getAddrRecordKeys (): string[] {
   return ['ETH', 'BTC', 'LTC', 'DOGE']
 }
+
+function coinTypeOrcoinId2Symbol (coinType: string): string {
+  let coinItem = formatsByName[coinType] ? formatsByName[coinType] : formatsByCoinType[coinType]
+  if (!coinItem) {
+    throw new AllDIDError(`AllDID do not supported ${coinType}`, AllDIDErrorCode.DidIsNotSupported)
+  }
+  return coinItem.name
+} 
 
 export class EnsService extends NamingService {
   serviceName = 'ens'
@@ -87,28 +92,23 @@ export class EnsService extends NamingService {
   }
 
   isRegistered (name: string): Promise<boolean> {
-    return this.isSupported ? this.owner(name).then((owner) => !!owner) : null
+    return this.owner(name).then((owner) => !!owner)
   }
 
   isAvailable (name: string): Promise<boolean> {
-    return this.isSupported
-      ? this.isRegistered(name).then((isRegistered) => !isRegistered)
-      : null
+    return this.isRegistered(name).then((isRegistered) => !isRegistered)
   }
 
   async owner (name: string): Promise<string> {
-    if (!this.isSupported(name)) return
-    const address = await this.tokenId(name)
-    return this.ensRegistrar.ownerOf(address)
+    const tokenID = await this.tokenId(name)
+    return this.ensRegistrar.ownerOf(tokenID)
   }
 
   manager (name: string): Promise<string> {
-    if (!this.isSupported(name)) return
     return this.ens.name(name).getOwner()
   }
 
   tokenId (name: string): Promise<string> {
-    if (!this.isSupported(name)) return
     const nameArray = name.split('.')
     const label = nameArray[0]
     const tokenID: string = labelhash(label).toString()
@@ -117,7 +117,6 @@ export class EnsService extends NamingService {
 
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem> {
-    if (!this.isSupported(name)) return
     const ensName = this.ens.name(name)
     const keyArray = key.split('.')
     const type = keyArray.length > 1 ? keyArray[0] : ''
@@ -140,7 +139,6 @@ export class EnsService extends NamingService {
   }
 
   records (name: string, keys?: string[]): Promise<RecordItem[]> {
-    if (!this.isSupported(name)) return
     if (!keys) keys = getTextRecordKeys().map((key) => `text.${key}`)
     const requestArray: Array<Promise<RecordItem>> = []
     keys.forEach((key) => requestArray.push(this.record(name, key)))
@@ -151,14 +149,13 @@ export class EnsService extends NamingService {
     name: string,
     keys?: string | string[]
   ): Promise<RecordItemAddr[]> {
-    if (!this.isSupported(name)) return
     if (!keys) {
       keys = getAddrRecordKeys()
     }
     if (Array.isArray(keys)) {
       const records = await this.records(
         name,
-        keys.map((key) => `address.${key}`)
+        keys.map((key) => `address.${coinTypeOrcoinId2Symbol(key)}`)
       )
       return records.map((record) => ({
         ...record,
@@ -166,19 +163,19 @@ export class EnsService extends NamingService {
       }))
     }
     else {
-      const record = await this.record(name, `address.${keys}`)
+      const symbol = coinTypeOrcoinId2Symbol(keys);
+      const record = await this.record(name, `address.${symbol}`)
       return [
         {
           ...record,
-          symbol: keys.toUpperCase(),
+          symbol,
         },
       ]
     }
   }
 
-  async addr (name: string): Promise<RecordItemAddr> {
-    if (!this.isSupported(name)) return
-    const symbol = 'ETH'
+  async addr (name: string, key: string): Promise<RecordItemAddr> {
+    let symbol = coinTypeOrcoinId2Symbol(key?.toUpperCase());
     return {
       ...(await this.record(name, `address.${symbol}`)),
       symbol,
@@ -186,7 +183,6 @@ export class EnsService extends NamingService {
   }
 
   dweb (name: string): Promise<string> {
-    if (!this.isSupported(name)) return
     return this.ens.name(name).getContent()
   }
 
@@ -197,15 +193,12 @@ export class EnsService extends NamingService {
 
   async reverse (
     address: string,
-    currencyTicker: string
   ): Promise<string | null> {
-    const name = await this.ens.getName(address)
-    if (!this.isSupported(name)) return
-    return this.ens.name(name).getAddress(currencyTicker)
+    const { name } = await this.ens.getName(address)
+    return name
   }
 
   registryAddress (name: string): Promise<string> {
-    if (!this.isSupported(name)) return
     return this.ens.ens.address
   }
 }

@@ -10,7 +10,7 @@ describe('ENSService', () => {
     })
 
     it('do not support abc.bit', async () => {
-      await expect(ensService.isSupported('abc.bit')).toBe(false)
+      expect(ensService.isSupported('abc.bit')).toBe(false)
     })
 
     it('leon.eth has been registered', async () => {
@@ -25,12 +25,12 @@ describe('ENSService', () => {
 
     it('address that owner of leon.eth is valid', async () => {
       const owner = await ensService.owner('leon.eth')
-      expect(owner).toMatch(/^0x[0-9A-Fa-f]{40}$/)
+      expect(owner).toEqual('0xfA45C6991a2C3d74ada3A279E21135133CE3Da8A')
     })
 
     it('tokenId that owner of leon.eth is valid', async () => {
       const tokenId = await ensService.tokenId('leon.eth')
-      expect(tokenId).toMatch(/^0x[0-9A-Fa-f]{64}$/)
+      expect(tokenId).toEqual('0x341104cc982fbc19bb9076dbf7c842bf288cb7eaa42e23d66f80c02021f4a56e')
     })
 
     it("leont.eth's text record", async () => {
@@ -60,7 +60,7 @@ describe('ENSService', () => {
     })
 
     it("leont.eth's addr is valid", async () => {
-      const addr = await ensService.addr('leont.eth')
+      const addr = await ensService.addr('leont.eth', 'ETH')
       expect(addr).toEqual({
         key: 'address.ETH',
         label: '',
@@ -87,14 +87,19 @@ describe('ENSService', () => {
       ])
     })
 
-    it('leont.eth\'s reverse is invalid', async () => {
-      const name = await ensService.addrs('0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa')
-      expect(name).not.toEqual('leont.eth')
-    })
+    
 
     it('leont.eth\'s registryAddress is valid', async () => {
       const name = await ensService.addrs('leont.eth')
       expect(name).toEqual('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e')
+    })
+  })
+
+  describe('isSupported', () => {
+    jest.setTimeout(30000);
+    it('leont.eth\'s reverse is valid', async () => {
+      const name = await ensService.reverse('0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa')
+      expect(name).toEqual('leont.eth')
     })
   })
 })
