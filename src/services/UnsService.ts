@@ -48,6 +48,10 @@ function trimKeyPrefix (key: string): string {
   return recordLabels.join('.')
 }
 
+function getDwebKeys (): string[] {
+  return ['text.ipfs.html.value', 'text.dweb.ipfs.hash']
+}
+
 
 export class UnsService extends NamingService {
   serviceName = 'uns'
@@ -150,7 +154,7 @@ export class UnsService extends NamingService {
   }
 
   async dwebs (name: string): Promise<string[]> {
-    const records = await this.records(name, ['text.ipfs.html.value', 'text.dweb.ipfs.hash'])
+    const records = await this.records(name, getDwebKeys())
     return records.map(v => v.value).filter(v => v)
   }
 
