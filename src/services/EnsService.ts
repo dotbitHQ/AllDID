@@ -1,5 +1,5 @@
 import ENS, { labelhash } from '@ensdomains/ensjs'
-import { formatsByName, formatsByCoinType } from "@ensdomains/address-encoder"
+import { formatsByName, formatsByCoinType } from '@ensdomains/address-encoder'
 import { ethers, Contract } from 'ethers'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
@@ -108,26 +108,40 @@ export class EnsService extends NamingService {
     return this.ens.name(name).getOwner()
   }
 
-  tokenId (name: string): Promise<string> {
+  async tokenId (name: string): Promise<string> {
     const nameArray = name.split('.')
     const label = nameArray[0]
     const tokenID: string = labelhash(label).toString()
-    return Promise.resolve(tokenID)
+    return tokenID
+  }
+  
+  async getAddress (name: string, subtype: string): Promise<string> {
+    const ensName = this.ens.name(name)
+    return ensName.getAddress(subtype)
+  }
+
+  async getText (name: string, subtype: string): Promise<string> {
+    const ensName = this.ens.name(name)
+    return ensName.getText(subtype)
+  }
+
+  async getRecord (name: string, type: string, subtype: string): Promise<string> {
+    let value
+    if (type === 'address') {
+      value = await this.getAddress(name, subtype)
+    }
+    else {
+      value = await this.getText(name, subtype)
+    }
+    return value
   }
 
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem> {
-    const ensName = this.ens.name(name)
     const keyArray = key.split('.')
     const type = keyArray.length > 1 ? keyArray[0] : ''
     const subtype = keyArray[keyArray.length - 1]
-    let value
-    if (type === 'address') {
-      value = await ensName.getAddress(subtype)
-    }
-    else {
-      value = await ensName.getText(subtype)
-    }
+    const value = await this.getRecord(name, type, subtype)
     return {
       key,
       type,
