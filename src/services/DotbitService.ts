@@ -6,6 +6,7 @@ import {
   RemoteTxBuilderConfig,
   BitSigner,
   DefaultConfig,
+  accountIdHex,
 } from 'dotbit'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { formatsByName } from '@ensdomains/address-encoder'
@@ -68,8 +69,8 @@ export class DotbitService extends NamingService {
     return this.dotbit.accountInfo(name).then(info => info.manager_key)
   }
 
-  tokenId (name: string): Promise<string> {
-    return null
+  async tokenId (name: string): Promise<string> {
+    return accountIdHex(name)
   }
 
   async record (name: string, key: string): Promise<RecordItem> {
@@ -134,7 +135,7 @@ export class DotbitService extends NamingService {
   }
 
   registryAddress (name: string): Promise<string> {
-    this.throwError('Unsupported Method', AllDIDErrorCode.RecordIsNotFound)
+    this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod)
     return null
   }
 }
