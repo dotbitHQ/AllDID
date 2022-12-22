@@ -38,7 +38,7 @@ function makeRecordItem (key: string, value: string): RecordItem {
 function makeRecordItemAddr (value: RecordItem): RecordItemAddr {
   return {
     ...value,
-    symbol: value.subtype.split('.')[0]
+    symbol: value.subtype.split('.')[1]
   }
 }
 
@@ -91,7 +91,7 @@ export class UnsService extends NamingService {
     return null
   }
 
- async tokenId (name: string): Promise<string> {
+  async tokenId (name: string): Promise<string> {
     const service = findNamingServiceName(name)
     return this.uns.namehash(name, service)
   }
@@ -151,7 +151,7 @@ export class UnsService extends NamingService {
 
   async dwebs (name: string): Promise<string[]> {
     const records = await this.records(name, ['text.ipfs.html.value', 'text.dweb.ipfs.hash'])
-    return records.map(v => v.value)
+    return records.map(v => v.value).filter(v => v)
   }
 
   reverse (address: string): Promise<string | null> {

@@ -3,11 +3,13 @@ import { AllDID } from './AllDID'
 import { DotbitService, DotbitServiceOptions } from './services/DotbitService'
 import { EnsService, EnsServiceOptions } from './services/EnsService'
 import { SIDService } from './services/SIDService'
+import { UnsService, UnsServiceOptions } from './services/UnsService'
 
 export interface CreateInstanceOptions {
   'dotbit': DotbitServiceOptions,
   'ens': EnsServiceOptions,
   'sid': EnsServiceOptions,
+  'uns': UnsServiceOptions,
 }
 
 export const defaultCreateInstanceOptions: CreateInstanceOptions = {
@@ -20,7 +22,8 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
     // from https://github.com/Space-ID/sidjs/blob/master/src/constants/rpc.js
     provider: new ethers.providers.JsonRpcProvider('https://bsc-mainnet.nodereal.io/v1/d0c3ef1cdb0247f4b6fae228aa76c8b8'),
     networkId: '56'
-  }
+  },
+  uns: undefined,
 }
 
 export function createInstance (options = defaultCreateInstanceOptions) {
