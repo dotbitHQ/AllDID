@@ -27,6 +27,10 @@ export abstract class NamingService {
     }
   }
 
+  throwError (message: string, errorCode: AllDIDErrorCode) {
+    throw new AllDIDError(`${this.serviceName} do not supported: ${message}`, errorCode)
+  }
+
   /**
    * Check if the given name is a valid DID name.
    * @param name
