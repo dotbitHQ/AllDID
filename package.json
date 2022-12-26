@@ -57,7 +57,6 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
-    "@ensdomains/address-encoder": "^0.1.7",
     "@ensdomains/ensjs": "^2.1.0",
     "@ethersproject/providers": "^5.7.2",
     "dotbit": "^0.4.13",

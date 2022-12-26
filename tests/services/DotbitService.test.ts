@@ -43,7 +43,7 @@ describe('DotbitService', () => {
     })
 
     it('leonx.bit\'s address is 0xc72b6f66017246d6a7f159f5c2bf358188ad9eca', async () => {
-      expect((await dotbitService.addr('leonx.bit', 'BSC'))).toEqual(
+      expect((await dotbitService.addr('leonx.bit', 'bsc'))).toEqual(
         {
           key: 'address.bsc',
           label: '',
@@ -68,9 +68,9 @@ describe('DotbitService', () => {
       )
     })
 
-    it('0xc72b6f66017246d6a7f159f5c2bf358188ad9eca\'s reverse is valid', async () => {
-      expect((await dotbitService.reverse('0xc72b6f66017246d6a7f159f5c2bf358188ad9eca', 'BNB'))).toEqual(
-        'leonx.bit',
+    it('0x1d643fac9a463c9d544506006a6348c234da485f\'s reverse is valid', async () => {
+      expect((await dotbitService.reverse('0x1d643fac9a463c9d544506006a6348c234da485f', 'eth'))).toEqual(
+        'jeffx.bit',
       )
     })
   })

@@ -27,6 +27,10 @@ export abstract class NamingService {
     }
   }
 
+  throwError(message: string, code: AllDIDErrorCode) {
+    throw new AllDIDError(`${message}`, code)
+  }
+
   /**
    * Check if the given name is a valid DID name.
    * @param name

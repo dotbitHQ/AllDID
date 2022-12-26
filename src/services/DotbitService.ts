@@ -7,10 +7,10 @@ import {
   BitSigner,
   DefaultConfig,
   accountIdHex,
+  CoinType
 } from 'dotbit'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
-import { formatsByName } from '@ensdomains/address-encoder'
-import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
+import { AllDIDErrorCode } from '../errors/AllDIDError'
 
 // todo: export config interface from dotbit.js
 export interface DotbitServiceOptions {
@@ -36,6 +36,13 @@ function bitARE2RecordItem (
   }
 }
 
+enum KeyPrefix {
+  Address= 'address',
+  Profile= 'profile',
+  Dweb = 'dweb',
+  Text = 'text'
+} 
+
 export class DotbitService extends NamingService {
   serviceName = 'dotbit'
 
@@ -43,10 +50,6 @@ export class DotbitService extends NamingService {
   constructor (options: DotbitServiceOptions) {
     super()
     this.dotbit = createInstance(options)
-  }
-
-  throwError(message: string, code: AllDIDErrorCode) {
-    throw new AllDIDError(`${message}`, code)
   }
 
   isSupported (name: string): boolean {
@@ -81,17 +84,16 @@ export class DotbitService extends NamingService {
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     let records = await this.dotbit.records(name)
     records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
-    console.log(records)
     return records.map(record => bitARE2RecordItem(record))
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     let addrs
     if (Array.isArray(keys)) {
-      addrs = Promise.all(keys.map(async (key) => await this.dotbit.addrs(name, `address.${key}`)))
+      addrs = Promise.all(keys.map(async (key) => await this.dotbit.addrs(name, key.toUpperCase())))
     }
     else {
-      addrs = await this.dotbit.addrs(name, keys)
+      addrs = await this.dotbit.addrs(name, keys.toUpperCase())
     }
     return addrs
   }
@@ -104,13 +106,13 @@ export class DotbitService extends NamingService {
         symbol: addrs[0].subtype.toUpperCase()
       }
     }
-    this.throwError(`${name}'s address is not found`, AllDIDErrorCode.RecordIsNotFound)
+    return null
   }
 
   async dweb (name: string): Promise<any> {
     const dweb = await this.dotbit.dweb(name)
     if (!dweb) {
-      this.throwError(`${name}'s dweb is not found`, AllDIDErrorCode.RecordIsNotFound)
+      return null
     }
     return dweb.value
   }
@@ -118,16 +120,16 @@ export class DotbitService extends NamingService {
   async dwebs (name: string, protocol?: string): Promise<string[]> {
     const dwebs = await this.dotbit.dwebs(name, protocol)
     if (!dwebs || dwebs.length <= 0) {
-      this.throwError(`${name}'s dweb is not found`, AllDIDErrorCode.RecordIsNotFound)
+      return []
     }
     return dwebs.map(dweb => (`${dweb.value}`))
   }
 
   async reverse (address: string, currencyTicker: string): Promise<string | null> {
-    const format = formatsByName[currencyTicker]
-    console.log(currencyTicker, format)
+    const coinType = CoinType[currencyTicker.toUpperCase()]
+    if (!coinType) return null
     const keyInfo = {
-      coinType: format.coinType,
+      coinType: coinType,
       key: address,
     }
     const bitAccount = await this.dotbit.reverse(keyInfo)
