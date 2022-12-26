@@ -5,6 +5,8 @@ describe('ENSService', () => {
   const ensService = new EnsService(defaultCreateInstanceOptions.ens)
 
   describe('isSupported', () => {
+    jest.setTimeout(30000);
+
     it('support abc.eth', () => {
       expect(ensService.isSupported('abc.eth')).toBe(true)
     })
@@ -33,11 +35,11 @@ describe('ENSService', () => {
       expect(tokenId).toEqual('0x341104cc982fbc19bb9076dbf7c842bf288cb7eaa42e23d66f80c02021f4a56e')
     })
 
-    it("leont.eth's text record", async () => {
-      const record = await ensService.record('leont.eth', 'text.keywords')
+    it("leont.eth\'s profile record", async () => {
+      const record = await ensService.record('leont.eth', 'profile.keywords')
       expect(record).toEqual({
-        key: 'text.keywords',
-        type: 'text',
+        key: 'profile.keywords',
+        type: 'profile',
         subtype: 'keywords',
         label: '',
         value: 'noway',
@@ -46,11 +48,11 @@ describe('ENSService', () => {
     })
 
     it("leont.eth's text records", async () => {
-      const records = await ensService.records('leont.eth', ['text.keywords'])
+      const records = await ensService.records('leont.eth', ['profile.keywords'])
       expect(records).toEqual([
         {
-          key: 'text.keywords',
-          type: 'text',
+          key: 'profile.keywords',
+          type: 'profile',
           subtype: 'keywords',
           label: '',
           value: 'noway',
@@ -59,13 +61,13 @@ describe('ENSService', () => {
       ])
     })
 
-    it("leont.eth's addr is valid", async () => {
-      const addr = await ensService.addr('leont.eth', 'ETH')
+    it("leont.eth's addr is 0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa", async () => {
+      const addr = await ensService.addr('leont.eth', 'eth')
       expect(addr).toEqual({
-        key: 'address.ETH',
+        key: 'address.eth',
         label: '',
-        subtype: 'ETH',
-        symbol: 'ETH',
+        subtype: 'eth',
+        symbol: 'eth',
         ttl: 0,
         type: 'address',
         value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa'
@@ -76,10 +78,10 @@ describe('ENSService', () => {
       const addr = await ensService.addrs('leont.eth', 'ETH')
       expect(addr).toEqual([
         {
-          key: 'address.ETH',
+          key: 'address.eth',
           label: '',
-          subtype: 'ETH',
-          symbol: 'ETH',
+          subtype: 'eth',
+          symbol: 'eth',
           ttl: 0,
           type: 'address',
           value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa'
@@ -90,12 +92,13 @@ describe('ENSService', () => {
     
 
     it('leont.eth\'s registryAddress is valid', async () => {
-      const name = await ensService.addrs('leont.eth')
+      const name = await ensService.registryAddress('leont.eth')
       expect(name).toEqual('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e')
     })
+
   })
 
-  describe('isSupported', () => {
+  describe('reverse', () => {
     jest.setTimeout(30000);
     it('leont.eth\'s reverse is valid', async () => {
       const name = await ensService.reverse('0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa')

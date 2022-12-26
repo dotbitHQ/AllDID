@@ -1,10 +1,8 @@
 import ENS, { labelhash } from '@ensdomains/ensjs'
-import { formatsByName, formatsByCoinType } from '@ensdomains/address-encoder'
 import { ethers, Contract } from 'ethers'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
-import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider,
@@ -46,7 +44,7 @@ function getRegistrarAddress (networkId: string): string {
   }
 }
 
-function getTextRecordKeys (): string[] {
+function getProfileKeys (): string[] {
   return [
     'email',
     'url',
@@ -58,16 +56,15 @@ function getTextRecordKeys (): string[] {
   ]
 }
 
-function getAddrRecordKeys (): string[] {
+function getAddressKeys (): string[] {
   return ['ETH', 'BTC', 'LTC', 'DOGE']
 }
 
-function coinTypeOrcoinId2Symbol (coinType: string): string {
-  let coinItem = formatsByName[coinType] ? formatsByName[coinType] : formatsByCoinType[coinType]
-  if (!coinItem) {
-    throw new AllDIDError(`AllDID do not supported ${coinType}`, AllDIDErrorCode.DidIsNotSupported)
-  }
-  return coinItem.name
+enum KeyPrefix {
+  Address= 'address',
+  Profile= 'profile',
+  Dweb = 'dweb',
+  Text = 'text'
 } 
 
 export class EnsService extends NamingService {
@@ -91,12 +88,14 @@ export class EnsService extends NamingService {
     return /^.+\.eth$/.test(name)
   }
 
-  isRegistered (name: string): Promise<boolean> {
-    return this.owner(name).then((owner) => !!owner)
+  async isRegistered (name: string): Promise<boolean> {
+    const owner = await this.owner(name)
+    return owner ? true : false
   }
 
-  isAvailable (name: string): Promise<boolean> {
-    return this.isRegistered(name).then((isRegistered) => !isRegistered)
+  async isAvailable (name: string): Promise<boolean> {
+    const isRegistered = await this.isRegistered(name)
+    return isRegistered ? false : true
   }
 
   async owner (name: string): Promise<string> {
@@ -114,21 +113,37 @@ export class EnsService extends NamingService {
     const tokenID: string = labelhash(label).toString()
     return tokenID
   }
-  
-  async getAddress (name: string, subtype: string): Promise<string> {
-    const ensName = this.ens.name(name)
-    return ensName.getAddress(subtype)
+
+  protected makeRecordItem (key: string): RecordItem {
+    const keyArray = key.split('.')
+    const type = keyArray.length > 1 ? keyArray[0] : ''
+    const subtype = keyArray[keyArray.length - 1]
+    return {
+      key,
+      type,
+      subtype,
+      label: '',
+      value: null,
+      ttl: 0,
+    }
   }
 
-  async getText (name: string, subtype: string): Promise<string> {
+  protected makeRecordKey (subtype: string): string {
+    let textKey = subtype.toLowerCase()
+    let addressKey = subtype.toUpperCase()
+    const key = getAddressKeys().find(v => v === addressKey) ? addressKey : getProfileKeys().find(v => v === textKey)
+    return key ? key : null
+  }
+
+  protected async getText (name: string, subtype: string): Promise<string> {
     const ensName = this.ens.name(name)
     return ensName.getText(subtype)
   }
 
-  async getRecord (name: string, type: string, subtype: string): Promise<string> {
+  protected async getRecord (name: string, type: string, subtype: string): Promise<string> {
     let value
     if (type === 'address') {
-      value = await this.getAddress(name, subtype)
+      value = await this.addr(name, subtype)
     }
     else {
       value = await this.getText(name, subtype)
@@ -138,22 +153,18 @@ export class EnsService extends NamingService {
 
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem> {
-    const keyArray = key.split('.')
-    const type = keyArray.length > 1 ? keyArray[0] : ''
-    const subtype = keyArray[keyArray.length - 1]
-    const value = await this.getRecord(name, type, subtype)
-    return {
-      key,
-      type,
-      subtype,
-      label: '',
-      value,
-      ttl: 0,
-    }
+    const recordItem = this.makeRecordItem(key);
+    const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
+    recordItem.value = value
+    return recordItem
   }
 
   records (name: string, keys?: string[]): Promise<RecordItem[]> {
-    if (!keys) keys = getTextRecordKeys().map((key) => `text.${key}`)
+    if (!keys) {
+      const profileKeys = getProfileKeys().map((key) => `${KeyPrefix.Profile}.${key.toLowerCase()}`)
+      const addressKeys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
+      keys = profileKeys.concat(addressKeys)
+    }
     const requestArray: Array<Promise<RecordItem>> = []
     keys.forEach((key) => requestArray.push(this.record(name, key)))
     return Promise.all<RecordItem>(requestArray)
@@ -164,35 +175,31 @@ export class EnsService extends NamingService {
     keys?: string | string[]
   ): Promise<RecordItemAddr[]> {
     if (!keys) {
-      keys = getAddrRecordKeys()
+      keys = getAddressKeys()
     }
     if (Array.isArray(keys)) {
-      const records = await this.records(
-        name,
-        keys.map((key) => `address.${coinTypeOrcoinId2Symbol(key)}`)
-      )
-      return records.map((record) => ({
-        ...record,
-        symbol: record.key.split('.')[1].toUpperCase(),
-      }))
+      const requestArray = []
+      keys.forEach((key) => requestArray.push(this.addr(name, key)))
+      const records = await Promise.all<RecordItemAddr>(requestArray)
+      return records
     }
     else {
-      const symbol = coinTypeOrcoinId2Symbol(keys);
-      const record = await this.record(name, `address.${symbol}`)
+      const recordAddr = await this.addr(name, keys)
       return [
-        {
-          ...record,
-          symbol,
-        },
+        recordAddr
       ]
     }
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr> {
-    let symbol = coinTypeOrcoinId2Symbol(key?.toUpperCase());
+    const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
+    const addressKey = this.makeRecordKey(key)
+    if (addressKey) {
+      recordItem.value = await this.ens.name(name).getAddress(addressKey)
+    }
     return {
-      ...(await this.record(name, `address.${symbol}`)),
-      symbol,
+      ...recordItem,
+      symbol: recordItem.subtype
     }
   }
 
