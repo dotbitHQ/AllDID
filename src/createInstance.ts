@@ -24,8 +24,8 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
     networkId: '56'
   },
   solana: {
-    // from https://github.com/solana-labs/solana-web3.js/blob/v1.72.0/src/utils/cluster.ts
-    provider: createProvider('https://api.mainnet-beta.solana.com'),
+    // from https://solana.com/rpc
+    provider: createProvider('https://rpc.ankr.com/solana'),
     network: 'mainnet-beta'
   }
 }

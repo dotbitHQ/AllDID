@@ -1,7 +1,15 @@
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { Connection, Commitment, ConnectionConfig, PublicKey } from '@solana/web3.js'
-import { getDomainKey, NameRegistryState, Record, getRecord, getIpfsRecord, performReverseLookup } from "@bonfida/spl-name-service";
-import { AllDIDErrorCode } from 'src/errors/AllDIDError';
+import { 
+  getDomainKey, 
+  NameRegistryState, 
+  Record, 
+  getIpfsRecord, 
+  performReverseLookup,
+  getAllDomains,
+  resolve
+} from "@bonfida/spl-name-service";
+import { AllDIDErrorCode } from '../errors/AllDIDError';
 
 export function createProvider(
   endpoint: string,
@@ -50,7 +58,7 @@ function getAddressKeys () {
     'SOL',
     'LTC',
     'DOGE',
-    'BSC'
+    // 'BSC' // @bonfida/spl-name-service v0.1.51 does not support BSC
   ]
 }
 
@@ -75,9 +83,18 @@ export class SolanaService extends NamingService {
     return /^.+\.sol$/.test(name)
   }
 
+  protected async isValidPubkey(pubkey: PublicKey): Promise<boolean> {
+    const nameAccount = await this.provider.getAccountInfo(pubkey)
+    return nameAccount ? true : false
+  }
+
+  protected getSolAddress (data: Buffer ): string {
+    return new PublicKey(data.slice(0, 32)).toString()
+  }
+
   async isRegistered (name: string): Promise<boolean> {
-    const owner = await this.owner(name)
-    return owner ? true : false
+    const { pubkey } = await getDomainKey(name);
+    return this.isValidPubkey(pubkey)
   }
 
   async isAvailable (name: string): Promise<boolean> {
@@ -86,6 +103,8 @@ export class SolanaService extends NamingService {
 
   async owner (name: string): Promise<string> {
     const { pubkey } = await getDomainKey(name);
+    const isValid = await this.isValidPubkey(pubkey)
+    if (!isValid) return null
     const { registry, nftOwner } = await NameRegistryState.retrieve(
       this.provider,
       pubkey
@@ -102,40 +121,58 @@ export class SolanaService extends NamingService {
     return null
   }
 
-  async getRecord (name: string, subtype: string): Promise<string> {
-    let textKey = subtype.slice(0, 1).toUpperCase() + subtype.slice(1).toLowerCase()
-    let addressKey = subtype.toUpperCase()
-    const key = Record[textKey] ? Record[textKey] : (Record[addressKey] ? Record[addressKey] : null)
-    if (!key) {
-      this.throwError('Record Not Found', AllDIDErrorCode.RecordNotFound)
-      return
-    }
-    const { data } = await getRecord(this.provider, name, key);
-    return data.toString()
-  }
-
-  async record (name: string, key: string): Promise<RecordItem> {
+  protected makeRecordItem (key: string): RecordItem {
     const keyArray = key.split('.')
     const type = keyArray.length > 1 ? keyArray[0] : ''
     const subtype = keyArray[keyArray.length - 1]
-    const value = await this.getRecord(name, subtype)
     return {
       key,
       type,
       subtype,
       label: '',
-      value,
+      value: null,
       ttl: 0,
     }
+  }
+
+  protected makeRecordKey (subtype: string): string {
+    let textKey = subtype.slice(0, 1).toUpperCase() + subtype.slice(1).toLowerCase()
+    let addressKey = subtype.toUpperCase()
+    const key = Record[textKey] ? Record[textKey] : (Record[addressKey] ? Record[addressKey] : null)
+    if (!key) {
+      this.throwError(`Record Not Found: ${subtype}`, AllDIDErrorCode.RecordNotFound)
+      return
+    }
+    return key
+  }
+
+  protected async getRecord (name: string, key: string): Promise<string> {
+    const { pubkey } = await getDomainKey(key + "." + name, true)
+    const isValidPubkey = await this.isValidPubkey(pubkey)
+    if (!isValidPubkey) return null
+
+    let { registry } = await NameRegistryState.retrieve(this.provider, pubkey)
+  
+    const idx = registry.data?.indexOf(0x00);
+    const data = registry.data?.slice(0, idx);
+
+    return key === 'SOL' ? this.getSolAddress(data) : data.toString()
+  }
+
+  async record (name: string, key: string): Promise<RecordItem> {
+    const recordItem = this.makeRecordItem(key)
+    const recordKey = this.makeRecordKey(recordItem.subtype)
+    recordItem.value = await this.getRecord(name, recordKey)
+    return recordItem
   }
 
   records (name: string, keys?: string[]): Promise<RecordItem[]> {
     const requestArray: Array<Promise<RecordItem>> = []
     if (!keys) {
-      const addressKeys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key}`)
-      const profileKeys = getProfileKeys().map( key => `${KeyPrefix.Profile}.${key}`)
-      const dwebKeys = getDwebKeys().map( key => `${KeyPrefix.Dweb}.${key}`)
-      const textKeys = getTextKeys().map( key => `${KeyPrefix.Text}.${key}` )
+      const addressKeys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
+      const profileKeys = getProfileKeys().map((key) => `${KeyPrefix.Profile}.${key.toLowerCase()}`)
+      const dwebKeys = getDwebKeys().map((key) => `${KeyPrefix.Dweb}.${key.toLowerCase()}`)
+      const textKeys = getTextKeys().map((key) => `${KeyPrefix.Text}.${key.toLowerCase()}`)
       keys = addressKeys.concat(profileKeys).concat(dwebKeys).concat(textKeys)
     }
     keys.forEach((key) => requestArray.push(this.record(name, key)))
@@ -144,10 +181,10 @@ export class SolanaService extends NamingService {
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     let records = []
-    if (!keys) keys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key}`)
-    else if (Array.isArray(keys)) {
-      const records = await this.records(name, keys)
-      records.concat(records.map(record => ({
+    if (!keys) keys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
+    if (Array.isArray(keys)) {
+      const recordsList = await this.records(name, keys)
+      records = records.concat(recordsList.map(record => ({
         ...record,
         symbol: record.subtype
       })))
@@ -165,13 +202,28 @@ export class SolanaService extends NamingService {
   }
 
   async addr (name: string): Promise<RecordItemAddr> {
-    const addrs = this.addrs(name, `${KeyPrefix.Address}.SOL`)
-    return addrs[0]
+    const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.sol`)
+    const { pubkey } = await getDomainKey(name)
+    const isValid = await this.isValidPubkey(pubkey)
+    if (isValid) {
+      const address = await resolve(this.provider, name);
+      recordItem.value = address.toString()
+    }
+    return {
+      ...recordItem,
+      symbol: recordItem.subtype
+    }
   }
 
   async dweb (name: string): Promise<string> {
-    const { data } = await getIpfsRecord(this.provider, name)
-    return data.toString()
+    let dweb = null
+    const { pubkey } = await getDomainKey(name)
+    const isValid = await this.isValidPubkey(pubkey)
+    if (isValid) {
+      const { data } = await getIpfsRecord(this.provider, name)
+      dweb = data.toString()
+    }
+    return dweb
   }
 
   async dwebs (name: string): Promise<string[]> {
@@ -180,9 +232,15 @@ export class SolanaService extends NamingService {
   }
 
   // Solana address only
-  reverse (address: string): Promise<string | null> {
-    const domainKey = new PublicKey(address)
-    return performReverseLookup(this.provider, domainKey)
+  async reverse (address: string): Promise<string | null> {
+    let reverse = null
+    const addressKey = new PublicKey(address)
+    const isValid = await this.isValidPubkey(addressKey)
+    if (isValid) {
+      const domains = await getAllDomains(this.provider, addressKey);
+      reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
+    }
+    return reverse
   }
   
   // https://bonfida.github.io/solana-name-service-guide/domain-name/domain-tld.html

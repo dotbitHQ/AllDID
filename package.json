@@ -57,10 +57,10 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
-    "@bonfida/spl-name-service": "^0.1.59",
+    "@bonfida/spl-name-service": "0.1.51",
     "@ensdomains/ensjs": "^2.1.0",
     "@ethersproject/providers": "^5.7.2",
-    "@solana/web3.js": "^1.72.0",
+    "@solana/web3.js": "1.67.0",
     "dotbit": "^0.4.13",
     "ethers": "^5.7.2"
   }
