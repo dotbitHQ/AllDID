@@ -21,35 +21,61 @@ function findNamingServiceName (
   }
 };
 
-function makeRecordItem (key: string, value: string): RecordItem {
+function makeRecordItem (key: string): RecordItem {
   const keyArray = key.split('.')
-  const type = keyArray.length > 1 ? keyArray.shift() : ''
-  const subtype = keyArray.join(".")
+  const type = keyArray.length > 1 ? keyArray[0] : ''
+  const subtype = keyArray.length > 1 ? keyArray[keyArray.length - 1] : ''
   return {
     key,
     type,
     subtype,
     label: '',
-    value,
+    value: null,
     ttl: 0,
   }
 }
 
-function makeRecordItemAddr (value: RecordItem): RecordItemAddr {
-  return {
-    ...value,
-    symbol: value.subtype.split('.')[1]
+function allDIDKeyToUnsKey (key: string): string {
+  const keys = key.split('.')
+  let unsKey = ''
+  switch(keys[0]) {
+    case KeyPrefix.Address: unsKey = `crypto.${keys[1].toUpperCase()}.address`;break;
+    case KeyPrefix.Dweb: unsKey = `dweb.${keys[1].toLowerCase()}.hash`;break;
+    case KeyPrefix.Profile: 
+      if (keys[1] == 'picture') unsKey = `social.picture.value`
+      if (keys[1] == 'email' || keys[1] == 'for_sale' || keys[1] == 'url') 
+        unsKey = `whois.${keys[1]}.value`
+    case KeyPrefix.Text: break;
   }
+  return unsKey
 }
 
-function trimKeyPrefix (key: string): string {
-  const recordLabels = key.split('.')
-  recordLabels.shift()
-  return recordLabels.join('.')
+enum KeyPrefix {
+  Address= 'address',
+  Profile= 'profile',
+  Dweb = 'dweb',
+  Text = 'text'
+} 
+
+function unsKeyToAllDIDKey (key: string): string {
+  const keys = key.split('.')
+  let unsKey = ''
+  switch(keys[0]) {
+    case 'crypto': unsKey = `${KeyPrefix.Address}.${keys[1].toLowerCase()}`;break;
+
+    case 'ipfs':
+    case 'dweb': unsKey = `${KeyPrefix.Dweb}.${keys[1].toLowerCase()}_${keys[2]}`;break;
+
+    case 'gundb': 
+    case 'whois': 
+    case 'social':
+    case 'forwarding': unsKey = `${KeyPrefix.Profile}.${keys[1].toLowerCase()}`;break;
+  }
+  return unsKey
 }
 
 function getDwebKeys (): string[] {
-  return ['text.ipfs.html.value', 'text.dweb.ipfs.hash']
+  return ['ipfs.html.value', 'dweb.ipfs.hash', 'dweb.bzz.hash']
 }
 
 
@@ -62,20 +88,9 @@ export class UnsService extends NamingService {
     this.uns = new UNS({ sourceConfig: options })
   }
 
-  protected throwError (message: string, code: AllDIDErrorCode) {
-    throw new AllDIDError(`${message}`, code)
-  }
-
-  isSupported (name: string): boolean {
-    const tokens = name.split('.')
-    return (
-      !!tokens.length &&
-      !(
-        name === 'eth' ||
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(name)
-      ) &&
-      tokens.every((v) => !!v.length)
-    )
+  async isSupported (name: string): Promise<boolean> {
+   const isSupported = await this.uns.isSupportedDomain(name)
+   return isSupported
   }
 
   isRegistered (name: string): Promise<boolean> {
@@ -102,60 +117,77 @@ export class UnsService extends NamingService {
 
   // key: 'address.${Uns key}'
   async record (name: string, key: string): Promise<RecordItem> {
-    const value = await this.uns.record(name, trimKeyPrefix(key))
-    return makeRecordItem(key, value)
+    const recordItem = makeRecordItem(key)
+    const unsKey = allDIDKeyToUnsKey(key)
+    recordItem.value = await this.uns.record(name, unsKey)
+    return recordItem
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     let recordObj
     if (keys) {
-      recordObj = await this.uns.records(name, keys.map(key => trimKeyPrefix(key)))
+      recordObj = await this.uns.records(name, keys.map(key => allDIDKeyToUnsKey(key)))
     }
     else {
       recordObj = await this.uns.allNonEmptyRecords(name)
     }
     const recordKeys = Object.keys(recordObj)
     return recordKeys.map(
-      recordKey => makeRecordItem(keys.find(key => key.includes(recordKey)), recordObj[recordKey])
+      recordKey => {
+        const recordItem = makeRecordItem(unsKeyToAllDIDKey(recordKey))
+        recordItem.value = recordObj[recordKey]
+        return recordItem
+      }
     )
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     if (!keys) {
       const records = await this.uns.allNonEmptyRecords(name)
-      const recordKeys = Object.keys(records).filter(key => key.split('.')[0] === 'crypto')
+      const recordKeys = Object.keys(records)
+        .filter(key => key.split('.')[0] === 'crypto')
       return recordKeys.map(key => {
-        const record = makeRecordItem(key, records[key])
-        return makeRecordItemAddr(record)
+        const allDIDKey = unsKeyToAllDIDKey(key)
+        const record = makeRecordItem(allDIDKey)
+        record.value = records[key]
+        return {
+          ...record,
+          symbol: record.subtype.toUpperCase()
+        }
       })
     }
     else if (Array.isArray(keys)) {
-      const records = await this.records(name, keys.map(key => `address.crypto.${key.toUpperCase()}.address`))
-      return records.map(record => makeRecordItemAddr(record))
+      const records = await this.records(name, keys.map(key => `${KeyPrefix.Address}.${key.toLowerCase()}`))
+      return records.map(record => ({
+        ...record,
+        symbol: record.subtype.toUpperCase()
+      }))
     }
     else {
       const record = await this.addr(name, keys)
-      return [makeRecordItemAddr(record)]
+      return [{
+        ...record,
+        symbol: record.subtype.toUpperCase()
+      }]
     }
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr> {
-    const recordKey = `address.crypto.${key.toUpperCase()}.address`
-    const value = await this.record(name, recordKey)
+    const recordItem = makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
+    recordItem.value = await this.uns.addr(name, key)
     return {
-      ...value,
-      symbol: key
+      ...recordItem,
+      symbol: recordItem.subtype.toUpperCase()
     }
   }
 
-  async dweb (name: string): Promise<string> {
-    const record = await this.record(name, 'text.ipfs.html.value')
-    return record.value
+  dweb (name: string): Promise<string> {
+    return this.uns.ipfsHash(name)
   }
 
   async dwebs (name: string): Promise<string[]> {
-    const records = await this.records(name, getDwebKeys())
-    return records.map(v => v.value).filter(v => v)
+    const records = await this.uns.records(name, getDwebKeys());
+    return Object.values(records).filter(v => v)
   }
 
   reverse (address: string): Promise<string | null> {
