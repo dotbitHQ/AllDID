@@ -36,6 +36,20 @@ function bitARE2RecordItem (
   }
 }
 
+function makeRecordItem (key: string): RecordItem {
+  const keyArray = key.split('.')
+  const type = keyArray.length > 1 ? keyArray[0] : ''
+  const subtype = keyArray[keyArray.length - 1]
+  return {
+    key,
+    type,
+    subtype,
+    label: '',
+    value: '',
+    ttl: 0,
+  }
+}
+
 enum KeyPrefix {
   Address= 'address',
   Profile= 'profile',
@@ -78,7 +92,12 @@ export class DotbitService extends NamingService {
 
   async record (name: string, key: string): Promise<RecordItem> {
     const records = await this.dotbit.records(name, key)
-    return bitARE2RecordItem(records[0])
+    if (records.length > 0) {
+      return bitARE2RecordItem(records[0])
+    }
+    else {
+      return makeRecordItem(key)
+    }
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
@@ -88,9 +107,17 @@ export class DotbitService extends NamingService {
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
-    let addrs
+    let addrs = []
     if (Array.isArray(keys)) {
-      addrs = Promise.all(keys.map(async (key) => await this.dotbit.addrs(name, key.toUpperCase())))
+      const dotbitAddrs = await this.dotbit.addrs(name)
+      addrs = addrs.concat(
+        dotbitAddrs.filter(
+          record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
+        ).map(v => ({
+            ...bitARE2RecordItem(v),
+            symbol: v.subtype.toUpperCase()
+        }))
+      )
     }
     else {
       addrs = await this.dotbit.addrs(name, keys.toUpperCase())
@@ -106,7 +133,10 @@ export class DotbitService extends NamingService {
         symbol: addrs[0].subtype.toUpperCase()
       }
     }
-    return null
+    return {
+      ...makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`),
+      symbol: key.toUpperCase()
+    }
   }
 
   async dweb (name: string): Promise<any> {
