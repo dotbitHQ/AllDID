@@ -62,12 +62,12 @@ describe('ENSService', () => {
     })
 
     it("leont.eth's addr is 0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa", async () => {
-      const addr = await ensService.addr('leont.eth', 'eth')
+      const addr = await ensService.addr('leont.eth', 'ETH')
       expect(addr).toEqual({
         key: 'address.eth',
         label: '',
         subtype: 'eth',
-        symbol: 'eth',
+        symbol: 'ETH',
         ttl: 0,
         type: 'address',
         value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa'
@@ -81,7 +81,7 @@ describe('ENSService', () => {
           key: 'address.eth',
           label: '',
           subtype: 'eth',
-          symbol: 'eth',
+          symbol: 'ETH',
           ttl: 0,
           type: 'address',
           value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa'

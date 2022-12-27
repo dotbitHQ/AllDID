@@ -27,6 +27,7 @@ function getEnsAddress (networkId: string): string {
   else if ([56].includes(parseInt(networkId))) {
     return '0x08CEd32a7f3eeC915Ba84415e9C07a7286977956'
   }
+  return ''
 }
 
 function getRegistrarAddress (networkId: string): string {
@@ -42,6 +43,7 @@ function getRegistrarAddress (networkId: string): string {
   else if ([56].includes(parseInt(networkId))) {
     return '0xE3b1D32e43Ce8d658368e2CBFF95D57Ef39Be8a6'
   }
+  return ''
 }
 
 function getProfileKeys (): string[] {
@@ -94,8 +96,7 @@ export class EnsService extends NamingService {
   }
 
   async isAvailable (name: string): Promise<boolean> {
-    const isRegistered = await this.isRegistered(name)
-    return isRegistered ? false : true
+    return this.isRegistered(name).then((isRegistered) => !isRegistered)
   }
 
   async owner (name: string): Promise<string> {
@@ -121,9 +122,9 @@ export class EnsService extends NamingService {
     return {
       key,
       type,
-      subtype,
+      subtype: subtype.toLowerCase(),
       label: '',
-      value: null,
+      value: '',
       ttl: 0,
     }
   }
@@ -132,7 +133,7 @@ export class EnsService extends NamingService {
     let textKey = subtype.toLowerCase()
     let addressKey = subtype.toUpperCase()
     const key = getAddressKeys().find(v => v === addressKey) ? addressKey : getProfileKeys().find(v => v === textKey)
-    return key ? key : null
+    return key ? key : ''
   }
 
   protected async getText (name: string, subtype: string): Promise<string> {
@@ -155,7 +156,10 @@ export class EnsService extends NamingService {
   async record (name: string, key: string): Promise<RecordItem> {
     const recordItem = this.makeRecordItem(key);
     const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
-    recordItem.value = value
+    if (value) {
+      recordItem.value = value
+      return recordItem
+    }
     return recordItem
   }
 
@@ -178,7 +182,7 @@ export class EnsService extends NamingService {
       keys = getAddressKeys()
     }
     if (Array.isArray(keys)) {
-      const requestArray = []
+      const requestArray: Promise<RecordItemAddr>[] = []
       keys.forEach((key) => requestArray.push(this.addr(name, key)))
       const records = await Promise.all<RecordItemAddr>(requestArray)
       return records
@@ -199,7 +203,7 @@ export class EnsService extends NamingService {
     }
     return {
       ...recordItem,
-      symbol: recordItem.subtype
+      symbol: recordItem.subtype.toUpperCase()
     }
   }
 
