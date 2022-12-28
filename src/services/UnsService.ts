@@ -102,8 +102,14 @@ export class UnsService extends NamingService {
     }
   }
 
-  isRegistered (name: string): Promise<boolean> {
-    return this.uns.isRegistered(name)
+  async isRegistered (name: string): Promise<boolean> {
+    try {
+      return this.uns.isRegistered(name)
+    } catch (e) {
+      console.log(e.code, e.message)
+      if (e.code === ResolutionErrorCode.UnregisteredDomain) return false
+      throw e
+    }
   }
 
   isAvailable (name: string): Promise<boolean> {

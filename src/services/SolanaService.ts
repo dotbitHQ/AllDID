@@ -103,7 +103,7 @@ export class SolanaService extends NamingService {
 
   async owner (name: string): Promise<string> {
     if (!(await this.isRegistered(name))) {
-      this.throwError(this.serviceName + ": Unregistered domain name", AllDIDErrorCode.UnregisteredName)
+      this.throwError(`${this.serviceName}: Unregistered domain name ${name}`, AllDIDErrorCode.UnregisteredName)
     }
     const { pubkey } = await getDomainKey(name);
     const { registry, nftOwner } = await NameRegistryState.retrieve(

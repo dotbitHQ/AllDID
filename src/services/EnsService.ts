@@ -3,6 +3,7 @@ import { ethers, Contract } from 'ethers'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
+import { AllDIDErrorCode } from '../errors/AllDIDError'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider,
@@ -74,6 +75,9 @@ export class EnsService extends NamingService {
 
   ens: ENS
   ensRegistrar: Contract
+
+  emptyAddress = '0x0000000000000000000000000000000000000000'
+
   constructor (options: EnsServiceOptions) {
     super()
     this.ens = new ENS({
@@ -91,7 +95,13 @@ export class EnsService extends NamingService {
   }
 
   async isRegistered (name: string): Promise<boolean> {
-    const owner = await this.owner(name)
+    let owner
+    try {
+      owner = await this.owner(name)
+    } catch (e) {
+      if (e.code === AllDIDErrorCode.UnregisteredName) return false
+      throw e
+    }
     return owner ? true : false
   }
 
@@ -100,8 +110,14 @@ export class EnsService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
-    const tokenID = await this.tokenId(name)
-    return this.ensRegistrar.ownerOf(tokenID)
+    const manager = await this.manager(name)
+    if (manager !== this.emptyAddress) {
+      const tokenID = await this.tokenId(name)
+      return this.ensRegistrar.ownerOf(tokenID)
+    }
+    else {
+     this.throwError(`${this.serviceName}: Unregistered domain name ${name}`, AllDIDErrorCode.UnregisteredName)
+    }
   }
 
   manager (name: string): Promise<string> {

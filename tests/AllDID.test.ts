@@ -47,4 +47,34 @@ describe('AllDID', () => {
       expect(await alldid.isRegistered('abbbc.wallet')).toBe(false)
     })
   })
+  
+  describe('isRegistered', () => {
+    it('scorpiocat51.sol is available', async () => {
+      expect(await alldid.isAvailable('scorpiocat51.sol')).toBe(true)
+    })
+    it('leonx.bnb is available', async () => {
+      expect(await alldid.isAvailable('leonx.bnb')).toBe(true)
+    })
+
+    it('scorpiocat51.nft is not available', async () => {
+      expect(await alldid.isAvailable('scorpiocat51.nft')).toBe(false)
+    })
+  })
+  
+  describe('owner', () => {
+    it('the owner of Brad.crypto is valid', async () => {
+      expect(await alldid.owner('Brad.crypto')).toEqual('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8')
+    })
+    it('the owner of leon.bnb is valid', async () => {
+      expect(await alldid.owner('leon.bnb')).toEqual('0xec2F69E6EA001615297367b9F1B6c9e25f695E0a')
+    })
+
+    it('the owner of BBrraadd.bnb is invalid', async () => {
+      await expect(alldid.owner('BBrraadd.bnb')).rejects.toThrow(`UnregisteredName: sid: Unregistered domain name BBrraadd.bnb`)
+    })
+
+    it('the owner of BBrraadd.sol is invalid', async () => {
+      await expect(alldid.owner('BBrraadd.sol')).rejects.toThrow(`UnregisteredName: solana: Unregistered domain name BBrraadd.sol`)
+    })
+  })
 })
