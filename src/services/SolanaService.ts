@@ -102,9 +102,10 @@ export class SolanaService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
+    if (!(await this.isRegistered(name))) {
+      this.throwError(this.serviceName + ": Unregistered domain name", AllDIDErrorCode.UnregisteredName)
+    }
     const { pubkey } = await getDomainKey(name);
-    const isValid = await this.isValidPubkey(pubkey)
-    if (!isValid) return null
     const { registry, nftOwner } = await NameRegistryState.retrieve(
       this.provider,
       pubkey
@@ -204,11 +205,12 @@ export class SolanaService extends NamingService {
 
   async addr (name: string): Promise<RecordItemAddr | null> {
     const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.sol`)
-    const { pubkey } = await getDomainKey(name)
-    const isValid = await this.isValidPubkey(pubkey)
-    if (!isValid) return null
+    if (!(await this.isRegistered(name))) {
+      this.throwError(this.serviceName + ": Unregistered domain name", AllDIDErrorCode.UnregisteredName)
+    }
     const address = await resolve(this.provider, name);
     recordItem.value = address.toString()
+    if (!recordItem.value) return null
     return {
       ...recordItem,
       symbol: recordItem.subtype
@@ -217,9 +219,7 @@ export class SolanaService extends NamingService {
 
   async dweb (name: string): Promise<string> {
     let dweb = null
-    const { pubkey } = await getDomainKey(name)
-    const isValid = await this.isValidPubkey(pubkey)
-    if (isValid) {
+    if (await this.isRegistered(name)) {
       const { data } = await getIpfsRecord(this.provider, name)
       dweb = data.toString()
     }
