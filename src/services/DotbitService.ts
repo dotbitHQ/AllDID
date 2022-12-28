@@ -90,13 +90,13 @@ export class DotbitService extends NamingService {
     return accountIdHex(name)
   }
 
-  async record (name: string, key: string): Promise<RecordItem> {
+  async record (name: string, key: string): Promise<RecordItem | null> {
     const records = await this.dotbit.records(name, key)
     if (records.length > 0) {
       return bitARE2RecordItem(records[0])
     }
     else {
-      return makeRecordItem(key)
+      return null
     }
   }
 
@@ -125,7 +125,7 @@ export class DotbitService extends NamingService {
     return addrs
   }
 
-  async addr (name: string, key: string): Promise<RecordItemAddr> {
+  async addr (name: string, key: string): Promise<RecordItemAddr | null> {
     const addrs = await this.dotbit.addrs(name, key)
     if (addrs.length > 0) {
       return {
@@ -133,10 +133,7 @@ export class DotbitService extends NamingService {
         symbol: addrs[0].subtype.toUpperCase()
       }
     }
-    return {
-      ...makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`),
-      symbol: key.toUpperCase()
-    }
+    return null
   }
 
   async dweb (name: string): Promise<any> {
