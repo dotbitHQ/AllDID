@@ -27,7 +27,7 @@ export abstract class NamingService {
     }
   }
 
-  throwError(message: string, code: AllDIDErrorCode) {
+  protected throwError (message: string, code: AllDIDErrorCode) {
     throw new AllDIDError(`${message}`, code)
   }
 
@@ -35,7 +35,7 @@ export abstract class NamingService {
    * Check if the given name is a valid DID name.
    * @param name
    */
-  abstract isSupported (name: string): boolean
+  abstract isSupported (name: string): boolean | Promise<boolean>
 
   /**
    * Check if the given name is registered
