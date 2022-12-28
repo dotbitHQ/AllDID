@@ -1,4 +1,4 @@
-import UNS, { SourceConfig, NamingServiceName } from '@unstoppabledomains/resolution'
+import UNS, { SourceConfig, NamingServiceName, ResolutionErrorCode } from '@unstoppabledomains/resolution'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
 
@@ -122,8 +122,8 @@ export class UnsService extends NamingService {
     const unsKey = allDIDKeyToUnsKey(key)
     try {
       recordItem.value = await this.uns.record(name, unsKey)
-    } catch {
-      return null
+    } catch (e) {
+      if (e.code == ResolutionErrorCode.RecordNotFound) return null
     }
     return recordItem
   }
@@ -137,8 +137,10 @@ export class UnsService extends NamingService {
       recordObj = await this.uns.allNonEmptyRecords(name)
     }
     const recordKeys = Object.keys(recordObj)
-    return recordKeys.filter(key => key).map(
+    return recordKeys.map(
       recordKey => {
+        // when the keys are passed in, there may be Null in the query result
+        if (!recordObj[recordKey]) return null
         const recordItem = makeRecordItem(unsKeyToAllDIDKey(recordKey))
         recordItem.value = recordObj[recordKey]
         return recordItem
@@ -182,9 +184,8 @@ export class UnsService extends NamingService {
     const recordItem = makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
     try {
       recordItem.value = await this.uns.addr(name, key)
-    }
-    catch {
-      return null
+    } catch (e) {
+      if (e.code == ResolutionErrorCode.RecordNotFound) return null
     }
     return {
       ...recordItem,
@@ -200,8 +201,8 @@ export class UnsService extends NamingService {
     let records: Record<string, string>
     try {
       records = await this.uns.records(name, getDwebKeys())
-    } catch {
-      return []
+    } catch (e) {
+      if (e.code == ResolutionErrorCode.RecordNotFound) return []
     }
     return Object.values(records).filter(v => v)
   }
