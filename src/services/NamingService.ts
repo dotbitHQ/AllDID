@@ -27,11 +27,15 @@ export abstract class NamingService {
     }
   }
 
+  protected throwError (message: string, code: AllDIDErrorCode) {
+    throw new AllDIDError(`${message}`, code)
+  }
+
   /**
    * Check if the given name is a valid DID name.
    * @param name
    */
-  abstract isSupported (name: string): boolean
+  abstract isSupported (name: string): boolean | Promise<boolean>
 
   /**
    * Check if the given name is registered
@@ -51,10 +55,10 @@ export abstract class NamingService {
   abstract tokenId (name: string): Promise<string>
 
   abstract records (name: string, keys?: string | string[]): Promise<RecordItem[]>
-  abstract record (name: string, key: string): Promise<RecordItem>
+  abstract record (name: string, key: string): Promise<RecordItem | null>
 
   abstract addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]>
-  abstract addr (name: string, keys?: string | string[]): Promise<RecordItemAddr>
+  abstract addr (name: string, keys?: string | string[]): Promise<RecordItemAddr | null>
 
   // abstract dwebs (name: string, keys?: string | string[]): Promise<RecordItemDweb[]>
   // abstract dweb (name: string): Promise<RecordItemDweb>
