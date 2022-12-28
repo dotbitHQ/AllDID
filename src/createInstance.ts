@@ -3,6 +3,7 @@ import { AllDID } from './AllDID'
 import { DotbitService, DotbitServiceOptions, defaultDotbitServiceOptions } from './services/DotbitService'
 import { EnsService, EnsServiceOptions } from './services/EnsService'
 import { SIDService } from './services/SIDService'
+import { DotbitExtensionService } from './services/DotbitExtensionService'
 import { SolanaService, SolanaServiceOptions, createProvider } from './services/SolanaService'
 import { UnsService, UnsServiceOptions } from './services/UnsService'
 
@@ -38,11 +39,13 @@ export function createInstance (options = defaultCreateInstanceOptions) {
   const dotbitService = new DotbitService(options.dotbit)
   const ensService = new EnsService(options.ens)
   const sidService = new SIDService(options.sid)
+  const dotbitExtensionService = new DotbitExtensionService(options.dotbit)
   const solanaService = new SolanaService(options.solana)
 
   alldid.installService(dotbitService)
   alldid.installService(ensService)
   alldid.installService(sidService)
+  alldid.installService(dotbitExtensionService)
   alldid.installService(solanaService)
 
   return alldid
