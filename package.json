@@ -58,9 +58,12 @@
   },
   "dependencies": {
     "@bonfida/spl-name-service": "0.1.51",
+    "@solana/web3.js": "1.67.0",
+    "@ensdomains/ens-contracts": "^0.0.15",
     "@ensdomains/ensjs": "^2.1.0",
     "@ethersproject/providers": "^5.7.2",
-    "@solana/web3.js": "1.67.0",
+    "@siddomains/sidjs": "^0.1.17",
+    "@unstoppabledomains/resolution": "^8.3.3",
     "dotbit": "^0.4.13",
     "ethers": "^5.7.2"
   }

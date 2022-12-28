@@ -1,19 +1,21 @@
 import { ethers } from 'ethers'
 import { AllDID } from './AllDID'
-import { DotbitService, DotbitServiceOptions } from './services/DotbitService'
+import { DotbitService, DotbitServiceOptions, defaultDotbitServiceOptions } from './services/DotbitService'
 import { EnsService, EnsServiceOptions } from './services/EnsService'
 import { SIDService } from './services/SIDService'
 import { SolanaService, SolanaServiceOptions, createProvider } from './services/SolanaService'
+import { UnsService, UnsServiceOptions } from './services/UnsService'
 
 export interface CreateInstanceOptions {
   'dotbit': DotbitServiceOptions,
   'ens': EnsServiceOptions,
   'sid': EnsServiceOptions,
   'solana': SolanaServiceOptions,
+  'uns': UnsServiceOptions,
 }
 
 export const defaultCreateInstanceOptions: CreateInstanceOptions = {
-  dotbit: undefined,
+  dotbit: defaultDotbitServiceOptions,
   ens: {
     provider: new ethers.providers.JsonRpcProvider('https://web3.ens.domains/v1/mainnet'),
     networkId: '1',
@@ -28,6 +30,7 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
     provider: createProvider('https://rpc.ankr.com/solana'),
     network: 'mainnet-beta'
   }
+  uns: undefined,
 }
 
 export function createInstance (options = defaultCreateInstanceOptions) {

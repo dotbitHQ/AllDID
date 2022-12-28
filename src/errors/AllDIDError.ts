@@ -3,6 +3,7 @@ export enum AllDIDErrorCode {
   UnsupportedMethod = 'UnsupportedMethod',
   RecordNotFound = 'RecordNotFound',
   UnregisteredName = 'UnregisteredName'
+  RecordIsNotFound = 'RecordIsNotFound',
 }
 
 export class AllDIDError extends Error {

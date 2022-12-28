@@ -16,8 +16,7 @@
     "allowJs": true,
     "baseUrl": "./",
     "outDir": "./lib",
-    "paths": {
-    }
+    "paths": {}
   },
 
   "include": [
@@ -28,11 +27,11 @@
     "*.js",
     "*.ts",
     "example",
-    "packages",
+    "packages"
   ],
   "exclude": [
     "**/*.spec.ts",
     "packages/**/lib.esm", // For some unclear reason, they will affect webstorm's type definition. We have to exclude them.
-    "packages/**/lib",
+    "packages/**/lib"
   ]
 }

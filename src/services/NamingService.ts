@@ -27,15 +27,15 @@ export abstract class NamingService {
     }
   }
 
-  throwError (message: string, errorCode: AllDIDErrorCode) {
-    throw new AllDIDError(`${this.serviceName} do not supported: ${message}`, errorCode)
+  protected throwError (message: string, code: AllDIDErrorCode) {
+    throw new AllDIDError(`${message}`, code)
   }
 
   /**
    * Check if the given name is a valid DID name.
    * @param name
    */
-  abstract isSupported (name: string): boolean
+  abstract isSupported (name: string): boolean | Promise<boolean>
 
   /**
    * Check if the given name is registered
