@@ -3,6 +3,7 @@ import { AllDID } from './AllDID'
 import { DotbitService, DotbitServiceOptions } from './services/DotbitService'
 import { EnsService, EnsServiceOptions } from './services/EnsService'
 import { SIDService } from './services/SIDService'
+import { DotbitExtensionService } from './services/DotbitExtensionService'
 
 export interface CreateInstanceOptions {
   'dotbit': DotbitServiceOptions,
@@ -28,10 +29,12 @@ export function createInstance (options = defaultCreateInstanceOptions) {
   const dotbitService = new DotbitService(options.dotbit)
   const ensService = new EnsService(options.ens)
   const sidService = new SIDService(options.sid)
+  const dotbitExtensionService = new DotbitExtensionService(options.dotbit)
 
   alldid.installService(dotbitService)
   alldid.installService(ensService)
   alldid.installService(sidService)
+  alldid.installService(dotbitExtensionService)
 
   return alldid
 }
