@@ -46,15 +46,15 @@ export class DotbitExtensionService extends DotbitService {
     return super.addrs(this.nameTransfer(name), keys)
   }
 
-  addr (name: string): Promise<RecordItemAddr | null> {
-    return super.addr(this.nameTransfer(name))
+  addr (name: string, currencyTicker: string): Promise<RecordItemAddr | null> {
+    return super.addr(this.nameTransfer(name), currencyTicker)
   }
 
   dweb (name: string): Promise<string | null> {
     return super.dweb(this.nameTransfer(name))
   }
 
-  dwebs (name: string): Promise<string | null> {
+  dwebs (name: string): Promise<string[]> {
     return super.dwebs(this.nameTransfer(name))
   }
 
