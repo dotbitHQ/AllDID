@@ -45,6 +45,7 @@ function allDIDKeyToUnsKey (key: string): string {
       if (keys[1] == 'picture') unsKey = `social.picture.value`
       if (keys[1] == 'email' || keys[1] == 'for_sale' || keys[1] == 'url') 
         unsKey = `whois.${keys[1]}.value`
+      break;
     case KeyPrefix.Text: break;
   }
   return unsKey
@@ -116,10 +117,14 @@ export class UnsService extends NamingService {
   }
 
   // key: 'address.${Uns key}'
-  async record (name: string, key: string): Promise<RecordItem> {
+  async record (name: string, key: string): Promise<RecordItem | null> {
     const recordItem = makeRecordItem(key)
     const unsKey = allDIDKeyToUnsKey(key)
-    recordItem.value = await this.uns.record(name, unsKey)
+    try {
+      recordItem.value = await this.uns.record(name, unsKey)
+    } catch {
+      return null
+    }
     return recordItem
   }
 
@@ -132,7 +137,7 @@ export class UnsService extends NamingService {
       recordObj = await this.uns.allNonEmptyRecords(name)
     }
     const recordKeys = Object.keys(recordObj)
-    return recordKeys.map(
+    return recordKeys.filter(key => key).map(
       recordKey => {
         const recordItem = makeRecordItem(unsKeyToAllDIDKey(recordKey))
         recordItem.value = recordObj[recordKey]
@@ -165,6 +170,7 @@ export class UnsService extends NamingService {
     }
     else {
       const record = await this.addr(name, keys)
+      if (!record) return null
       return [{
         ...record,
         symbol: record.subtype.toUpperCase()
@@ -172,9 +178,14 @@ export class UnsService extends NamingService {
     }
   }
 
-  async addr (name: string, key: string): Promise<RecordItemAddr> {
+  async addr (name: string, key: string): Promise<RecordItemAddr | null> {
     const recordItem = makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
-    recordItem.value = await this.uns.addr(name, key)
+    try {
+      recordItem.value = await this.uns.addr(name, key)
+    }
+    catch {
+      return null
+    }
     return {
       ...recordItem,
       symbol: recordItem.subtype.toUpperCase()
@@ -186,7 +197,12 @@ export class UnsService extends NamingService {
   }
 
   async dwebs (name: string): Promise<string[]> {
-    const records = await this.uns.records(name, getDwebKeys());
+    let records: Record<string, string>
+    try {
+      records = await this.uns.records(name, getDwebKeys())
+    } catch {
+      return []
+    }
     return Object.values(records).filter(v => v)
   }
 
