@@ -140,13 +140,12 @@ export class SolanaService extends NamingService {
     let addressKey = subtype.toUpperCase()
     const key = Record[textKey] ? Record[textKey] : (Record[addressKey] ? Record[addressKey] : null)
     if (!key) {
-      this.throwError(`Record Not Found: ${subtype}`, AllDIDErrorCode.RecordNotFound)
-      return
+      return null
     }
     return key
   }
 
-  protected async getRecord (name: string, key: string): Promise<string> {
+  protected async getRecord (name: string, key: string): Promise<string | null> {
     const { pubkey } = await getDomainKey(key + "." + name, true)
     const isValidPubkey = await this.isValidPubkey(pubkey)
     if (!isValidPubkey) return null
@@ -159,14 +158,15 @@ export class SolanaService extends NamingService {
     return key === 'SOL' ? this.getSolAddress(data) : data.toString()
   }
 
-  async record (name: string, key: string): Promise<RecordItem> {
+  async record (name: string, key: string): Promise<RecordItem | null> {
     const recordItem = this.makeRecordItem(key)
     const recordKey = this.makeRecordKey(recordItem.subtype)
     recordItem.value = await this.getRecord(name, recordKey)
+    if (!recordItem.value) return null
     return recordItem
   }
 
-  records (name: string, keys?: string[]): Promise<RecordItem[]> {
+  async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     const requestArray: Array<Promise<RecordItem>> = []
     if (!keys) {
       const addressKeys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
@@ -176,7 +176,7 @@ export class SolanaService extends NamingService {
       keys = addressKeys.concat(profileKeys).concat(dwebKeys).concat(textKeys)
     }
     keys.forEach((key) => requestArray.push(this.record(name, key)))
-    return Promise.all<RecordItem>(requestArray)
+    return (await Promise.all<RecordItem>(requestArray)).filter(v => v)
   } 
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
@@ -191,6 +191,7 @@ export class SolanaService extends NamingService {
     }
     else {
       const record = await this.record(name, keys)
+      if (!record) return records
       records.push(
         {
           ...record,
@@ -201,14 +202,13 @@ export class SolanaService extends NamingService {
     return records
   }
 
-  async addr (name: string): Promise<RecordItemAddr> {
+  async addr (name: string): Promise<RecordItemAddr | null> {
     const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.sol`)
     const { pubkey } = await getDomainKey(name)
     const isValid = await this.isValidPubkey(pubkey)
-    if (isValid) {
-      const address = await resolve(this.provider, name);
-      recordItem.value = address.toString()
-    }
+    if (!isValid) return null
+    const address = await resolve(this.provider, name);
+    recordItem.value = address.toString()
     return {
       ...recordItem,
       symbol: recordItem.subtype
