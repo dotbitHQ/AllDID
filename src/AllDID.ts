@@ -18,7 +18,7 @@ export class AllDID {
     return service
   }
 
-  async asyncFindService (callback: (service: NamingService) => boolean): Promise<NamingService | null> {
+  async asyncFindService (callback: (service: NamingService) => any): Promise<NamingService | null> {
     for (let nameService of this.services) {
       const item = await callback(nameService)
       if (item) return nameService

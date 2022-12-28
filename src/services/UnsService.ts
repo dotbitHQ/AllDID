@@ -1,6 +1,6 @@
 import UNS, { SourceConfig, NamingServiceName, ResolutionErrorCode } from '@unstoppabledomains/resolution'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
-import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
+import { AllDIDErrorCode } from '../errors/AllDIDError'
 
 export type UnsServiceOptions = SourceConfig
 
@@ -90,8 +90,16 @@ export class UnsService extends NamingService {
   }
 
   async isSupported (name: string): Promise<boolean> {
-   const isSupported = await this.uns.isSupportedDomain(name)
-   return isSupported
+    try {
+      const isSupported = await this.uns.isSupportedDomain(name)
+      return isSupported
+    } catch (e) {
+      if (
+        e.code === ResolutionErrorCode.InvalidDomainAddress || 
+        e.code ===ResolutionErrorCode.UnsupportedDomain
+      ) return false
+      throw e
+    }
   }
 
   isRegistered (name: string): Promise<boolean> {
