@@ -153,17 +153,17 @@ export class EnsService extends NamingService {
   }
 
   // key: type.subtype -> 'address.eth','text.email'
-  async record (name: string, key: string): Promise<RecordItem> {
+  async record (name: string, key: string): Promise<RecordItem | null> {
     const recordItem = this.makeRecordItem(key);
     const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
     if (value) {
       recordItem.value = value
       return recordItem
     }
-    return recordItem
+    return null
   }
 
-  records (name: string, keys?: string[]): Promise<RecordItem[]> {
+  async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     if (!keys) {
       const profileKeys = getProfileKeys().map((key) => `${KeyPrefix.Profile}.${key.toLowerCase()}`)
       const addressKeys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
@@ -171,7 +171,8 @@ export class EnsService extends NamingService {
     }
     const requestArray: Array<Promise<RecordItem>> = []
     keys.forEach((key) => requestArray.push(this.record(name, key)))
-    return Promise.all<RecordItem>(requestArray)
+    const result = await Promise.all<RecordItem>(requestArray)
+    return result.filter(v => v)
   }
 
   async addrs (
@@ -189,22 +190,23 @@ export class EnsService extends NamingService {
     }
     else {
       const recordAddr = await this.addr(name, keys)
-      return [
-        recordAddr
-      ]
+      return recordAddr ? [recordAddr] : []
     }
   }
 
-  async addr (name: string, key: string): Promise<RecordItemAddr> {
+  async addr (name: string, key: string): Promise<RecordItemAddr | null> {
     const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
     const addressKey = this.makeRecordKey(key)
     if (addressKey) {
       recordItem.value = await this.ens.name(name).getAddress(addressKey)
     }
-    return {
-      ...recordItem,
-      symbol: recordItem.subtype.toUpperCase()
+    if (recordItem.value) {
+      return {
+        ...recordItem,
+        symbol: recordItem.subtype.toUpperCase()
+      }
     }
+    return null
   }
 
   dweb (name: string): Promise<string> {
