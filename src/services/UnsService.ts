@@ -124,6 +124,7 @@ export class UnsService extends NamingService {
       recordItem.value = await this.uns.record(name, unsKey)
     } catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return null
+      throw e
     }
     return recordItem
   }
@@ -137,15 +138,15 @@ export class UnsService extends NamingService {
       recordObj = await this.uns.allNonEmptyRecords(name)
     }
     const recordKeys = Object.keys(recordObj)
-    return recordKeys.map(
-      recordKey => {
-        // when the keys are passed in, there may be Null in the query result
-        if (!recordObj[recordKey]) return null
-        const recordItem = makeRecordItem(unsKeyToAllDIDKey(recordKey))
-        recordItem.value = recordObj[recordKey]
-        return recordItem
-      }
-    )
+    // when the keys are passed in, there may be Null in the query result
+    return recordKeys.filter(recordKey => recordObj[recordKey])
+      .map(
+        recordKey => {
+          const recordItem = makeRecordItem(unsKeyToAllDIDKey(recordKey))
+          recordItem.value = recordObj[recordKey]
+          return recordItem
+        }
+      )
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
@@ -186,6 +187,7 @@ export class UnsService extends NamingService {
       recordItem.value = await this.uns.addr(name, key)
     } catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return null
+      throw e
     }
     return {
       ...recordItem,
@@ -203,6 +205,7 @@ export class UnsService extends NamingService {
       records = await this.uns.records(name, getDwebKeys())
     } catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return []
+      throw e
     }
     return Object.values(records).filter(v => v)
   }
