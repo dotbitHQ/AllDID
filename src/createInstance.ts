@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { AllDID } from './AllDID'
-import { DotbitService, DotbitServiceOptions } from './services/DotbitService'
+import { DotbitService, DotbitServiceOptions, defaultDotbitServiceOptions } from './services/DotbitService'
 import { EnsService, EnsServiceOptions } from './services/EnsService'
 import { SIDService } from './services/SIDService'
 import { UnsService, UnsServiceOptions } from './services/UnsService'
@@ -13,7 +13,7 @@ export interface CreateInstanceOptions {
 }
 
 export const defaultCreateInstanceOptions: CreateInstanceOptions = {
-  dotbit: undefined,
+  dotbit: defaultDotbitServiceOptions,
   ens: {
     provider: new ethers.providers.JsonRpcProvider('https://web3.ens.domains/v1/mainnet'),
     networkId: '1',
