@@ -104,9 +104,8 @@ export class UnsService extends NamingService {
 
   async isRegistered (name: string): Promise<boolean> {
     try {
-      return this.uns.isRegistered(name)
+      return await this.uns.isRegistered(name)
     } catch (e) {
-      console.log(e.code, e.message)
       if (e.code === ResolutionErrorCode.UnregisteredDomain) return false
       throw e
     }
@@ -116,8 +115,14 @@ export class UnsService extends NamingService {
     return this.uns.isAvailable(name)
   }
 
-  owner (name: string): Promise<string> {
-    return this.uns.owner(name)
+  async owner (name: string): Promise<string> {
+    try {
+      return await this.uns.owner(name)
+    } catch (e) {
+      console.log(e.code)
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
   }
 
   async manager (name: string): Promise<string> {
@@ -138,6 +143,7 @@ export class UnsService extends NamingService {
       recordItem.value = await this.uns.record(name, unsKey)
     } catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return null
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
     }
     return recordItem
@@ -201,6 +207,7 @@ export class UnsService extends NamingService {
       recordItem.value = await this.uns.addr(name, key)
     } catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return null
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
     }
     return {
@@ -209,8 +216,13 @@ export class UnsService extends NamingService {
     }
   }
 
-  dweb (name: string): Promise<string> {
-    return this.uns.ipfsHash(name)
+  async dweb (name: string): Promise<string> {
+    try {
+      return await this.uns.ipfsHash(name)
+    } catch (e) {
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
   }
 
   async dwebs (name: string): Promise<string[]> {
@@ -219,6 +231,7 @@ export class UnsService extends NamingService {
       records = await this.uns.records(name, getDwebKeys())
     } catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return []
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
     }
     return Object.values(records).filter(v => v)

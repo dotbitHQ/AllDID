@@ -7,7 +7,8 @@ import {
   BitSigner,
   DefaultConfig,
   accountIdHex,
-  CoinType
+  CoinType,
+  BitIndexerErrorCode
 } from 'dotbit'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { AllDIDErrorCode } from '../errors/AllDIDError'
@@ -78,78 +79,118 @@ export class DotbitService extends NamingService {
     return this.isRegistered(name).then(isRegistered => !isRegistered)
   }
 
-  owner (name: string): Promise<string> {
-    return this.dotbit.accountInfo(name).then(info => info.owner_key)
+  async owner (name: string): Promise<string> {
+    try {
+      return await this.dotbit.accountInfo(name).then(info => info.owner_key)
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
+    }
   }
 
-  manager (name: string): Promise<string> {
-    return this.dotbit.accountInfo(name).then(info => info.manager_key)
+  async manager (name: string): Promise<string> {
+    try {
+      return await this.dotbit.accountInfo(name).then(info => info.manager_key)
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
+    }
   }
 
+  // AccountID
   async tokenId (name: string): Promise<string> {
     return accountIdHex(name)
   }
 
   async record (name: string, key: string): Promise<RecordItem | null> {
-    const records = await this.dotbit.records(name, key)
-    if (records.length > 0) {
-      return bitARE2RecordItem(records[0])
+    try {
+      const records = await this.dotbit.records(name, key)
+      if (records.length > 0) {
+        return bitARE2RecordItem(records[0])
+      }
+      else {
+        return null
+      }
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
     }
-    else {
-      return null
-    }
+    
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
-    let records = await this.dotbit.records(name)
-    records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
-    return records.map(record => bitARE2RecordItem(record))
+    try {
+      let records = await this.dotbit.records(name)
+      records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
+      return records.map(record => bitARE2RecordItem(record))
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
+    }
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
-    let addrs = []
-    if (Array.isArray(keys)) {
-      const dotbitAddrs = await this.dotbit.addrs(name)
-      addrs = addrs.concat(
-        dotbitAddrs.filter(
-          record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
-        ).map(v => ({
-            ...bitARE2RecordItem(v),
-            symbol: v.subtype.toUpperCase()
-        }))
-      )
+    try {
+      let addrs = []
+      if (Array.isArray(keys)) {
+        const dotbitAddrs = await this.dotbit.addrs(name)
+        addrs = dotbitAddrs.filter(
+            record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
+          ).map(v => ({
+              ...bitARE2RecordItem(v),
+              symbol: v.subtype.toUpperCase()
+          }))
+      }
+      else {
+        addrs = await this.dotbit.addrs(name, keys.toUpperCase())
+      }
+      return addrs
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
     }
-    else {
-      addrs = await this.dotbit.addrs(name, keys.toUpperCase())
-    }
-    return addrs
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
-    const addrs = await this.dotbit.addrs(name, key)
-    if (addrs.length > 0) {
-      return {
-        ...bitARE2RecordItem(addrs[0]),
-        symbol: addrs[0].subtype.toUpperCase()
+    try {
+      const addrs = await this.dotbit.addrs(name, key)
+      if (addrs.length > 0) {
+        return {
+          ...bitARE2RecordItem(addrs[0]),
+          symbol: addrs[0].subtype.toUpperCase()
+        }
       }
+      return null
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
     }
-    return null
   }
 
   async dweb (name: string): Promise<any> {
-    const dweb = await this.dotbit.dweb(name)
-    if (!dweb) {
-      return null
+    try {
+      const dweb = await this.dotbit.dweb(name)
+      if (!dweb) {
+        return null
+      }
+      return dweb.value
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
     }
-    return dweb.value
   }
 
   async dwebs (name: string, protocol?: string): Promise<string[]> {
-    const dwebs = await this.dotbit.dwebs(name, protocol)
-    if (!dwebs || dwebs.length <= 0) {
-      return []
+    try {
+      const dwebs = await this.dotbit.dwebs(name, protocol)
+      if (!dwebs || dwebs.length <= 0) {
+        return []
+      }
+      return dwebs.map(dweb => (`${dweb.value}`))
+    } catch (e) {
+      if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
+      throw e
     }
-    return dwebs.map(dweb => (`${dweb.value}`))
   }
 
   async reverse (address: string, currencyTicker: string): Promise<string | null> {
