@@ -37,12 +37,13 @@
     "lib",
     "lib.esm"
   ],
+  "homepage": "https://github.com/dotbitHQ/AllDID",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dotbitHQ/denames.git"
+    "url": "https://github.com/dotbitHQ/AllDID.git"
   },
   "bugs": {
-    "url": "https://github.com/dotbitHQ/denames/issues"
+    "url": "https://github.com/dotbitHQ/AllDID/issues"
   },
   "devDependencies": {
     "@types/jest": "^28.1.2",
