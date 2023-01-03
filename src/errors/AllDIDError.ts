@@ -2,7 +2,7 @@ export enum AllDIDErrorCode {
   DidIsNotSupported = 'DidIsNotSupported',
   UnsupportedMethod = 'UnsupportedMethod',
   RecordNotFound = 'RecordNotFound',
-  UnregisteredName = 'UnregisteredName'
+  UnregisteredName = 'UnregisteredName',
   RecordIsNotFound = 'RecordIsNotFound',
 }
 

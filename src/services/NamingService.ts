@@ -26,9 +26,18 @@ export abstract class NamingService {
       throw new AllDIDError(`${this.serviceName} do not supported ${name}`, AllDIDErrorCode.DidIsNotSupported)
     }
   }
+  throwUnregistered (name) {
+    throw new AllDIDError(`${this.serviceName}: Unregistered domain name ${name}`, AllDIDErrorCode.UnregisteredName)
+  }
 
   protected throwError (message: string, code: AllDIDErrorCode) {
     throw new AllDIDError(`${message}`, code)
+  }
+
+  protected async checkRegistered (name: string) {
+    if (!(await this.isRegistered(name))) {
+      this.throwUnregistered(name)
+    }
   }
 
   /**

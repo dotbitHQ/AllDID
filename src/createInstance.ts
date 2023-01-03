@@ -30,7 +30,7 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
     // from https://solana.com/rpc
     provider: createProvider('https://rpc.ankr.com/solana'),
     network: 'mainnet-beta'
-  }
+  },
   uns: undefined,
 }
 
@@ -41,12 +41,14 @@ export function createInstance (options = defaultCreateInstanceOptions) {
   const sidService = new SIDService(options.sid)
   const dotbitExtensionService = new DotbitExtensionService(options.dotbit)
   const solanaService = new SolanaService(options.solana)
+  const unsService = new UnsService(options.uns)
 
   alldid.installService(dotbitService)
   alldid.installService(ensService)
   alldid.installService(sidService)
   alldid.installService(dotbitExtensionService)
   alldid.installService(solanaService)
+  alldid.installService(unsService)
 
   return alldid
 }

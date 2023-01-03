@@ -18,7 +18,7 @@ export class AllDID {
     return service
   }
 
-  async asyncFindService (callback: (service: NamingService) => boolean): Promise<NamingService | null> {
+  async asyncFindService (callback: (service: NamingService) => any): Promise<NamingService | null> {
     for (let nameService of this.services) {
       const item = await callback(nameService)
       if (item) return nameService
@@ -72,7 +72,7 @@ export class AllDID {
     return service.records(name, keys)
   }
 
-  async addrs (name: string, filter?: string): Promise<RecordItemAddr[]> {
+  async addrs (name: string, filter?: string | string[]): Promise<RecordItemAddr[]> {
     const service = await this.getServiceOrThrow(name)
 
     return service.addrs(name, filter)

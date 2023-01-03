@@ -7,7 +7,9 @@ import {
   getIpfsRecord, 
   performReverseLookup,
   getAllDomains,
-  resolve
+  resolve,
+  NAME_TOKENIZER_ID,
+  MINT_PREFIX
 } from "@bonfida/spl-name-service";
 import { AllDIDErrorCode } from '../errors/AllDIDError';
 
@@ -102,9 +104,7 @@ export class SolanaService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
-    if (!(await this.isRegistered(name))) {
-      this.throwError(this.serviceName + ": Unregistered domain name", AllDIDErrorCode.UnregisteredName)
-    }
+    await this.checkRegistered(name)
     const { pubkey } = await getDomainKey(name);
     const { registry, nftOwner } = await NameRegistryState.retrieve(
       this.provider,
@@ -114,12 +114,18 @@ export class SolanaService extends NamingService {
   }
 
   manager (name: string): Promise<string> {
-    return this.owner(name)
-  }
-
-  tokenId (name: string): Promise<string> {
     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod)
     return null
+  }
+
+  // return MintAccount Address
+  async tokenId (name: string): Promise<string> {
+    const { pubkey } = await getDomainKey(name);
+    const [mint] = await PublicKey.findProgramAddress(
+      [MINT_PREFIX, pubkey.toBuffer()],
+      NAME_TOKENIZER_ID
+    );
+    return mint.toBase58()
   }
 
   protected makeRecordItem (key: string): RecordItem {
@@ -147,6 +153,7 @@ export class SolanaService extends NamingService {
   }
 
   protected async getRecord (name: string, key: string): Promise<string | null> {
+    await this.checkRegistered(name)
     const { pubkey } = await getDomainKey(key + "." + name, true)
     const isValidPubkey = await this.isValidPubkey(pubkey)
     if (!isValidPubkey) return null
@@ -182,13 +189,16 @@ export class SolanaService extends NamingService {
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     let records = []
-    if (!keys) keys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
+    if (!keys) {
+      keys = getAddressKeys()
+    }
     if (Array.isArray(keys)) {
+      keys = keys.map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
       const recordsList = await this.records(name, keys)
-      records = records.concat(recordsList.map(record => ({
+      records = recordsList.map(record => ({
         ...record,
-        symbol: record.subtype
-      })))
+        symbol: record.subtype.toUpperCase()
+      }))
     }
     else {
       const record = await this.record(name, keys)
@@ -203,17 +213,14 @@ export class SolanaService extends NamingService {
     return records
   }
 
-  async addr (name: string): Promise<RecordItemAddr | null> {
-    const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.sol`)
-    if (!(await this.isRegistered(name))) {
-      this.throwError(this.serviceName + ": Unregistered domain name", AllDIDErrorCode.UnregisteredName)
-    }
-    const address = await resolve(this.provider, name);
-    recordItem.value = address.toString()
-    if (!recordItem.value) return null
+  async addr (name: string, key: string): Promise<RecordItemAddr | null> {
+    await this.checkRegistered(name)
+    // solana queries addresses by querying records
+    const recordItem = await this.record(name, `${KeyPrefix.Address}.${key}`)
+    if (!recordItem) return null
     return {
       ...recordItem,
-      symbol: recordItem.subtype
+      symbol: recordItem.subtype.toUpperCase()
     }
   }
 
