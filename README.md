@@ -1,5 +1,9 @@
 <h1 align="center">AllDID.js</h2>
 <p align="center">The all-in-one DID SDK, resolving all decentralized name(Web3 Name).</p>
+<div align="center">
+
+![NPM](https://img.shields.io/npm/l/alldid) ![npm](https://img.shields.io/npm/v/alldid)
+</div>
 
 > This is a whole new version of denames. If you are looking for the source code of npm package [denames](https://www.npmjs.com/package/denames)(Deprecated), please check out the branch [denames](https://github.com/dotbitHQ/denames/tree/denames).
 
@@ -17,10 +21,40 @@
 - Check if the given name is a valid DID name.(e.g. **isSupported, isRegistered, isAvailable**.)
 - Query DID name info (e.g. **owner, manager**.)
 - Query DID name records (e.g. **tokenId, records, addresses, dwebs, reverse and registryAddress**.)
+- Supported decentralized name suffix:
+  - Ethereum Name Service - ENS
+    - .eth
+  - .bit - DOTBIT
+    - .bit
+  - Solana Name Service - SNS
+    - .sol
+  - Unstoppable Domains Name Service - UNS. Please, refer to the [Top Level Domains List](https://resolve.unstoppabledomains.com/supported_tlds).
+    - .crypto
+    - .bitcoin
+    - .blockchain
+    - .dao
+    - .nft
+    - .888
+    - .wallet
+    - .x
+    - .klever
+    - .zil
+    - .hi
+  - Space ID - SID
+    - .bnb
 
 ## Getting Started
 
-You need to import AllDID.js SDK in your code and create an instance before interacting with it:
+First, you need to install `alldid` using [`npm`](https://www.npmjs.com/package/alldid)
+```bash
+npm install alldid --save
+```
+or [`yarn`](https://yarnpkg.com/package/alldid).
+```bash
+yarn add alldid
+```
+
+Then, you need to import AllDID.js SDK in your code and create an instance before interacting with it:
 ```javascript
 // For CommonJS
 const { createInstance } = require('alldid')
@@ -406,11 +440,11 @@ TBA
 ## Get Help
 If you have questions or need help with AllDID.js, there are several ways to get assistance:
 - Join the .bit community on [Discord channel](https://discord.gg/fVppR7z4ht).
-- File [issues](https://github.com/dotbitHQ/denames/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) on the GitHub repository for AllDID.js.
+- File [issues](https://github.com/dotbitHQ/AllDID/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) on the GitHub repository for AllDID.js.
 
 ## Contribute
 We welcome contributions to AllDID.js! If you are interested in helping to improve the project, there are several ways you can contribute:
-- Report bugs or suggest improvements by opening an [issue](https://github.com/dotbitHQ/denames/issues) on the GitHub repository.
+- Report bugs or suggest improvements by opening an [issue](https://github.com/dotbitHQ/AllDID/issues) on the GitHub repository.
 - Submit a pull request with your changes to the code.
 
 Please note that AllDID.js SDK is still under development, so any contribution (including pull requests) is welcome.
