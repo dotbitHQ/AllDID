@@ -36,44 +36,50 @@ const alldid = createInstance()
 Now you could perform various operations using AllDID.js SDK. Here is a simple example:
 ```javascript
 // Get DID name address
-alldid.addr('leonx.bit', 'eth').then(console.log)
-alldid.addr('leon.wallet', 'eth').then(console.log)
-alldid.addr('🍍.sol', 'eth').then(console.log)
+alldid.addrs('leonx.bit', ['eth']).then(console.log)
+alldid.addrs('leon.wallet', ['eth']).then(console.log)
+alldid.addrs('🍍.sol', ['eth']).then(console.log)
 ```
 A sample result would be like:
 ```javascript
 // leonx.bit
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "symbol":"ETH",
-  "ttl": 300,
-  "type": "address",
-  "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"
-}
+[
+  {
+    "key": "address.eth",
+    "label": "",
+    "subtype": "eth",
+    "symbol":"ETH",
+    "ttl": 300,
+    "type": "address",
+    "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"
+  }
+]
 
 // leon.wallet
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "symbol":"ETH",
-  "ttl": 0,
-  "type": "address",
-  "value": "0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1"
-}
+[
+  {
+    "key": "address.eth",
+    "label": "",
+    "subtype": "eth",
+    "symbol":"ETH",
+    "ttl": 0,
+    "type": "address",
+    "value": "0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1"
+  }
+]
 
 // 🍍.sol
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "symbol":"ETH",
-  "ttl": 0,
-  "type": "address",
-  "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"
-}
+[
+  {
+    "key": "address.eth",
+    "label": "",
+    "subtype": "eth",
+    "symbol":"ETH",
+    "ttl": 0,
+    "type": "address",
+    "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"
+  }
+]
 ```
 
 ## CHANGELOG
@@ -88,10 +94,10 @@ TBD
 - [owner(name)](#ownername)
 - [manager(name)](#managername)
 - [tokenId(name)](#tokenidname)
-- [record(name, key)](#recordname-key)
 - [records(name, keys?)](#recordsname-keys)
-- [addr(name, currencyTicker)](#addrname-currencyticker)
 - [addrs(name, currencyTicker?)](#addrsname-currencyticker)
+- dwebs(name)(todo)
+- reverse(address)(todo)
 - [registryAddress(name)](#registryaddressname)
 
 #### installService(service)
@@ -225,53 +231,6 @@ alldid.tokenId('leon.sol').then(console.log)
 "3iV8KnUZkM78tUAwWb9V9c7FWaFxCrqpC3tFzywrEayg"
 ```
 
-#### record(name, key)
-Query the record of DID name.
-
-##### Parameter
-name: string
-key: string
-
-##### Return Value
-RecordItem
-```ts
-export interface RecordItem {
-  key: string, // full key, like `address.eth`
-  type: string, // the type of the key, like `address`
-  subtype: string, // the subtype of the key, like `eth`
-  label: string, // the user customized label of the key, like `personal`
-  value: string, // the value of the key, like `0x123...abc`
-  ttl: number, // the ttl of the key
-}
-```
-##### Example
-```javascript
-// Query the record of the name
-alldid.record('leonx.bit', 'address.eth').then(console.log)
-alldid.record('🍍.sol', 'address.eth').then(console.log)
-
-// The printed result would be like:
-// leon.bit
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "ttl": 300,
-  "type": "address",
-  "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"
-}
-
-// 🍍.sol
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "ttl": 0,
-  "type": "address",
-  "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"
-}
-```
-
 #### records(name, keys?)
 Query all records of DID name, return an array.
 
@@ -366,52 +325,6 @@ alldid.records('Brad.crypto').then(console.log)
   }
 ]
 ```
-
-#### addr(name, currencyTicker)
-Query the address of DID name.
-
-##### Parameter
-name: string
-currencyTicker: string
-
-##### Return Value
-RecordItemAddr
-```ts
-export interface RecordItemAddr extends RecordItem {
-  symbol: string, // the symbol of the coin_type, like 'ETH'
-}
-```
-
-##### Example
-```javascript
-// Query the address of the name
-alldid.addr('leonx.bit', 'eth').then(console.log)
-alldid.addr('🍍.sol', 'eth').then(console.log)
-
-// The printed result would be like:
-// leonx.bit
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "ttl": 300,
-  "type": "address",
-  "symbol": "ETH",
-  "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"
-}
-
-// 🍍.sol
-{
-  "key": "address.eth",
-  "label": "",
-  "subtype": "eth",
-  "ttl": 0,
-  "type": "address",
-  "symbol": "ETH",
-  "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"
-}
-```
-
 #### addrs(name, currencyTicker?)
 Query the addresses of DID name.
 
