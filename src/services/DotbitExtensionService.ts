@@ -7,7 +7,7 @@ export class DotbitExtensionService extends DotbitService {
   }
 
   protected nameTransfer (name: string) {
-    return name + "bit"
+    return name + 'bit'
   }
 
   isSupported (name: string): boolean {
@@ -63,7 +63,7 @@ export class DotbitExtensionService extends DotbitService {
     if (!reverseValue) return null
     const labels = reverseValue.split('.')
     labels.pop()
-    return labels.join(".")
+    return labels.join('.')
   }
 
   registryAddress (name: string): Promise<string> {

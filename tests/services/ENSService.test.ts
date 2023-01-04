@@ -5,7 +5,7 @@ describe('ENSService', () => {
   const ensService = new EnsService(defaultCreateInstanceOptions.ens)
 
   describe('isSupported', () => {
-    jest.setTimeout(30000);
+    jest.setTimeout(30000)
 
     it('support abc.eth', () => {
       expect(ensService.isSupported('abc.eth')).toBe(true)
@@ -89,17 +89,14 @@ describe('ENSService', () => {
       ])
     })
 
-    
-
     it('leont.eth\'s registryAddress is valid', async () => {
       const name = await ensService.registryAddress('leont.eth')
       expect(name).toEqual('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e')
     })
-
   })
 
   describe('reverse', () => {
-    jest.setTimeout(30000);
+    jest.setTimeout(30000)
     it('leont.eth\'s reverse is valid', async () => {
       const name = await ensService.reverse('0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa')
       expect(name).toEqual('leont.eth')

@@ -7,17 +7,18 @@ export type UnsServiceOptions = SourceConfig
 const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
-};
+}
 
 function findNamingServiceName (
   domain: string,
 ): NamingServiceName {
-  const extension = domain.split('.').pop();
+  const extension = domain.split('.').pop()
 
   if (extension in domainExtensionToNamingServiceName) {
-    return domainExtensionToNamingServiceName[extension];
-  } else {
-    return domainExtensionToNamingServiceName.crypto;
+    return domainExtensionToNamingServiceName[extension]
+  }
+  else {
+    return domainExtensionToNamingServiceName.crypto
   }
 };
 
@@ -38,15 +39,16 @@ function makeRecordItem (key: string): RecordItem {
 function allDIDKeyToUnsKey (key: string): string {
   const keys = key.split('.')
   let unsKey = ''
-  switch(keys[0]) {
-    case KeyPrefix.Address: unsKey = `crypto.${keys[1].toUpperCase()}.address`;break;
-    case KeyPrefix.Dweb: unsKey = `dweb.${keys[1].toLowerCase()}.hash`;break;
-    case KeyPrefix.Profile: 
-      if (keys[1] == 'picture') unsKey = `social.picture.value`
-      if (keys[1] == 'email' || keys[1] == 'for_sale' || keys[1] == 'url') 
+  switch (keys[0]) {
+    case KeyPrefix.Address: unsKey = `crypto.${keys[1].toUpperCase()}.address`; break
+    case KeyPrefix.Dweb: unsKey = `dweb.${keys[1].toLowerCase()}.hash`; break
+    case KeyPrefix.Profile:
+      if (keys[1] == 'picture') unsKey = 'social.picture.value'
+      if (keys[1] == 'email' || keys[1] == 'for_sale' || keys[1] == 'url') {
         unsKey = `whois.${keys[1]}.value`
-      break;
-    case KeyPrefix.Text: break;
+      }
+      break
+    case KeyPrefix.Text: break
   }
   return unsKey
 }
@@ -56,21 +58,21 @@ enum KeyPrefix {
   Profile= 'profile',
   Dweb = 'dweb',
   Text = 'text'
-} 
+}
 
 function unsKeyToAllDIDKey (key: string): string {
   const keys = key.split('.')
   let unsKey = ''
-  switch(keys[0]) {
-    case 'crypto': unsKey = `${KeyPrefix.Address}.${keys[1].toLowerCase()}`;break;
+  switch (keys[0]) {
+    case 'crypto': unsKey = `${KeyPrefix.Address}.${keys[1].toLowerCase()}`; break
 
     case 'ipfs':
-    case 'dweb': unsKey = `${KeyPrefix.Dweb}.${keys[1].toLowerCase()}_${keys[2]}`;break;
+    case 'dweb': unsKey = `${KeyPrefix.Dweb}.${keys[1].toLowerCase()}_${keys[2]}`; break
 
-    case 'gundb': 
-    case 'whois': 
+    case 'gundb':
+    case 'whois':
     case 'social':
-    case 'forwarding': unsKey = `${KeyPrefix.Profile}.${keys[1].toLowerCase()}`;break;
+    case 'forwarding': unsKey = `${KeyPrefix.Profile}.${keys[1].toLowerCase()}`; break
   }
   return unsKey
 }
@@ -78,7 +80,6 @@ function unsKeyToAllDIDKey (key: string): string {
 function getDwebKeys (): string[] {
   return ['ipfs.html.value', 'dweb.ipfs.hash', 'dweb.bzz.hash']
 }
-
 
 export class UnsService extends NamingService {
   serviceName = 'uns'
@@ -93,10 +94,11 @@ export class UnsService extends NamingService {
     try {
       const isSupported = await this.uns.isSupportedDomain(name)
       return isSupported
-    } catch (e) {
+    }
+    catch (e) {
       if (
-        e.code === ResolutionErrorCode.InvalidDomainAddress || 
-        e.code ===ResolutionErrorCode.UnsupportedDomain
+        e.code === ResolutionErrorCode.InvalidDomainAddress ||
+        e.code === ResolutionErrorCode.UnsupportedDomain
       ) return false
       throw e
     }
@@ -105,7 +107,8 @@ export class UnsService extends NamingService {
   async isRegistered (name: string): Promise<boolean> {
     try {
       return await this.uns.isRegistered(name)
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code === ResolutionErrorCode.UnregisteredDomain) return false
       throw e
     }
@@ -118,7 +121,8 @@ export class UnsService extends NamingService {
   async owner (name: string): Promise<string> {
     try {
       return await this.uns.owner(name)
-    } catch (e) {
+    }
+    catch (e) {
       console.log(e.code)
       if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
@@ -141,7 +145,8 @@ export class UnsService extends NamingService {
     const unsKey = allDIDKeyToUnsKey(key)
     try {
       recordItem.value = await this.uns.record(name, unsKey)
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return null
       if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
@@ -205,7 +210,8 @@ export class UnsService extends NamingService {
     const recordItem = makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
     try {
       recordItem.value = await this.uns.addr(name, key)
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return null
       if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
@@ -219,7 +225,8 @@ export class UnsService extends NamingService {
   async dweb (name: string): Promise<string> {
     try {
       return await this.uns.ipfsHash(name)
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e
     }
@@ -229,7 +236,8 @@ export class UnsService extends NamingService {
     let records: Record<string, string>
     try {
       records = await this.uns.records(name, getDwebKeys())
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == ResolutionErrorCode.RecordNotFound) return []
       if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
       throw e

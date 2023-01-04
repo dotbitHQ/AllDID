@@ -26,6 +26,7 @@ export abstract class NamingService {
       throw new AllDIDError(`${this.serviceName} do not supported ${name}`, AllDIDErrorCode.DidIsNotSupported)
     }
   }
+
   throwUnregistered (name) {
     throw new AllDIDError(`${this.serviceName}: Unregistered domain name ${name}`, AllDIDErrorCode.UnregisteredName)
   }

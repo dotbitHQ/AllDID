@@ -48,7 +48,7 @@ describe('AllDID', () => {
       expect(await alldid.isRegistered('abbccbc.sol')).toBe(false)
     })
   })
-  
+
   describe('isAvailable', () => {
     it('leonttt.sol(.bit .bnb .eth .crypto) is available', async () => {
       expect(await alldid.isAvailable('scorpiocat51.sol')).toBe(true)
@@ -66,7 +66,7 @@ describe('AllDID', () => {
       expect(await alldid.isAvailable('leon.bit')).toBe(false)
     })
   })
-  
+
   describe('owner', () => {
     it('the owner of leon.wallet(.sol .eth .bnb .bit) is valid', async () => {
       expect(await alldid.owner('leon.bit')).toEqual('0x0403d6d288db8908b5ff21b60d347c6e450eb828')
@@ -77,11 +77,11 @@ describe('AllDID', () => {
     })
 
     it('the owner of BBrraadd.bit(.sol .crypto .bnb .eth) is invalid', async () => {
-      await expect(alldid.owner('BBrraadd.bit')).rejects.toThrow(`UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit`)
-      await expect(alldid.owner('BBrraadd.sol')).rejects.toThrow(`UnregisteredName: solana: Unregistered domain name BBrraadd.sol`)
-      await expect(alldid.owner('BBrraadd.crypto')).rejects.toThrow(`UnregisteredName: uns: Unregistered domain name BBrraadd.crypto`)
-      await expect(alldid.owner('BBrraadd.bnb')).rejects.toThrow(`UnregisteredName: sid: Unregistered domain name BBrraadd.bnb`)
-      await expect(alldid.owner('BBrraadd.eth')).rejects.toThrow(`UnregisteredName: ens: Unregistered domain name BBrraadd.eth`)
+      await expect(alldid.owner('BBrraadd.bit')).rejects.toThrow('UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit')
+      await expect(alldid.owner('BBrraadd.sol')).rejects.toThrow('UnregisteredName: solana: Unregistered domain name BBrraadd.sol')
+      await expect(alldid.owner('BBrraadd.crypto')).rejects.toThrow('UnregisteredName: uns: Unregistered domain name BBrraadd.crypto')
+      await expect(alldid.owner('BBrraadd.bnb')).rejects.toThrow('UnregisteredName: sid: Unregistered domain name BBrraadd.bnb')
+      await expect(alldid.owner('BBrraadd.eth')).rejects.toThrow('UnregisteredName: ens: Unregistered domain name BBrraadd.eth')
     })
   })
 
@@ -96,11 +96,11 @@ describe('AllDID', () => {
     })
 
     it('the manager of BBrraadd.bit(.sol .crypto .bnb .eth) is invalid', async () => {
-      await expect(alldid.manager('BBrraadd.bit')).rejects.toThrow(`UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit`)
+      await expect(alldid.manager('BBrraadd.bit')).rejects.toThrow('UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit')
       // await expect(alldid.manager('BBrraadd.sol')).rejects.toThrow(`UnsupportedMethod: Unsupported Method`)
       // await expect(alldid.manager('BBrraadd.crypto')).rejects.toThrow(`UnsupportedMethod: Unsupported Method`)
-      await expect(alldid.manager('BBrraadd.bnb')).rejects.toThrow(`UnregisteredName: sid: Unregistered domain name BBrraadd.bnb`)
-      await expect(alldid.manager('BBrraadd.eth')).rejects.toThrow(`UnregisteredName: ens: Unregistered domain name BBrraadd.eth`)
+      await expect(alldid.manager('BBrraadd.bnb')).rejects.toThrow('UnregisteredName: sid: Unregistered domain name BBrraadd.bnb')
+      await expect(alldid.manager('BBrraadd.eth')).rejects.toThrow('UnregisteredName: ens: Unregistered domain name BBrraadd.eth')
     })
   })
 
@@ -114,53 +114,53 @@ describe('AllDID', () => {
     })
 
     it('the tokenId of BBrraadd.crypto(.bnb .eth) is invalid', async () => {
-      // nameService will generate tokenId for name mapping 
+      // nameService will generate tokenId for name mapping
     })
   })
 
   describe('record', () => {
     it('the record of (.wallet .sol .eth .bnb .bit) is valid', async () => {
-      expect(await alldid.record('leonx.bit', 'address.eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 300, "type": "address", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"})
-      expect(await alldid.record('🍍.sol', 'address.eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"})
-      expect(await alldid.record('leon.wallet', 'address.eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "value": "0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1"})
-      expect(await alldid.record('leont.eth', 'address.eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"})
-      expect(await alldid.record('leon.bnb', 'address.bnb')).toEqual({"key": "address.bnb", "label": "", "subtype": "bnb", "ttl": 0, "type": "address", "value": "0xec2F69E6EA001615297367b9F1B6c9e25f695E0a"})
+      expect(await alldid.record('leonx.bit', 'address.eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 300, type: 'address', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' })
+      expect(await alldid.record('🍍.sol', 'address.eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6' })
+      expect(await alldid.record('leon.wallet', 'address.eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', value: '0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1' })
+      expect(await alldid.record('leont.eth', 'address.eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' })
+      expect(await alldid.record('leon.bnb', 'address.bnb')).toEqual({ key: 'address.bnb', label: '', subtype: 'bnb', ttl: 0, type: 'address', value: '0xec2F69E6EA001615297367b9F1B6c9e25f695E0a' })
     })
 
     it('the record of (.crypto .sol .crypto .bnb .eth) is invalid', async () => {
-      await expect(alldid.record('BBrraadd.bit', 'address.bit')).rejects.toThrow(`UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit`)
-      await expect(alldid.record('BBrraadd.sol', 'address.sol')).rejects.toThrow(`UnregisteredName: solana: Unregistered domain name BBrraadd.sol`)
-      await expect(alldid.record('BBrraadd.crypto', 'address.eth')).rejects.toThrow(`UnregisteredName: uns: Unregistered domain name BBrraadd.crypto`)
-      await expect(alldid.record('BBrraadd.bnb', 'address.bnb')).rejects.toThrow(`UnregisteredName: sid: Unregistered domain name BBrraadd.bnb`)
-      await expect(alldid.record('BBrraadd.eth', 'address.eth')).rejects.toThrow(`UnregisteredName: ens: Unregistered domain name BBrraadd.eth`)
+      await expect(alldid.record('BBrraadd.bit', 'address.bit')).rejects.toThrow('UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit')
+      await expect(alldid.record('BBrraadd.sol', 'address.sol')).rejects.toThrow('UnregisteredName: solana: Unregistered domain name BBrraadd.sol')
+      await expect(alldid.record('BBrraadd.crypto', 'address.eth')).rejects.toThrow('UnregisteredName: uns: Unregistered domain name BBrraadd.crypto')
+      await expect(alldid.record('BBrraadd.bnb', 'address.bnb')).rejects.toThrow('UnregisteredName: sid: Unregistered domain name BBrraadd.bnb')
+      await expect(alldid.record('BBrraadd.eth', 'address.eth')).rejects.toThrow('UnregisteredName: ens: Unregistered domain name BBrraadd.eth')
     })
   })
 
   describe('records', () => {
     it('the record of (.wallet .sol .eth .bnb .bit) is valid', async () => {
-      expect(await alldid.records('leonx.bit', ['address.eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 300, "type": "address", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"}])
-      expect(await alldid.records('🍍.sol', ['address.eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"}])
-      expect(await alldid.records('leon.wallet', ['address.eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "value": "0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1"}])
-      expect(await alldid.records('leont.eth', ['address.eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"}])
-      expect(await alldid.records('leon.bnb', ['address.bnb'])).toEqual([{"key": "address.bnb", "label": "", "subtype": "bnb", "ttl": 0, "type": "address", "value": "0xec2F69E6EA001615297367b9F1B6c9e25f695E0a"}])
+      expect(await alldid.records('leonx.bit', ['address.eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 300, type: 'address', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' }])
+      expect(await alldid.records('🍍.sol', ['address.eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6' }])
+      expect(await alldid.records('leon.wallet', ['address.eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', value: '0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1' }])
+      expect(await alldid.records('leont.eth', ['address.eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' }])
+      expect(await alldid.records('leon.bnb', ['address.bnb'])).toEqual([{ key: 'address.bnb', label: '', subtype: 'bnb', ttl: 0, type: 'address', value: '0xec2F69E6EA001615297367b9F1B6c9e25f695E0a' }])
     })
 
     it('the records of (.crypto .sol .crypto .bnb .eth) is invalid', async () => {
-      await expect(alldid.records('BBrraadd.bit', ['address.bit'])).rejects.toThrow(`UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit`)
-      await expect(alldid.records('BBrraadd.sol', ['address.sol'])).rejects.toThrow(`UnregisteredName: solana: Unregistered domain name BBrraadd.sol`)
-      await expect(alldid.records('BBrraadd.crypto', ['address.eth'])).rejects.toThrow(`UnregisteredName: uns: Unregistered domain name BBrraadd.crypto`)
-      await expect(alldid.records('BBrraadd.bnb', ['address.bnb'])).rejects.toThrow(`UnregisteredName: sid: Unregistered domain name BBrraadd.bnb`)
-      await expect(alldid.records('BBrraadd.eth', ['address.eth'])).rejects.toThrow(`UnregisteredName: ens: Unregistered domain name BBrraadd.eth`)
+      await expect(alldid.records('BBrraadd.bit', ['address.bit'])).rejects.toThrow('UnregisteredName: dotbit: Unregistered domain name BBrraadd.bit')
+      await expect(alldid.records('BBrraadd.sol', ['address.sol'])).rejects.toThrow('UnregisteredName: solana: Unregistered domain name BBrraadd.sol')
+      await expect(alldid.records('BBrraadd.crypto', ['address.eth'])).rejects.toThrow('UnregisteredName: uns: Unregistered domain name BBrraadd.crypto')
+      await expect(alldid.records('BBrraadd.bnb', ['address.bnb'])).rejects.toThrow('UnregisteredName: sid: Unregistered domain name BBrraadd.bnb')
+      await expect(alldid.records('BBrraadd.eth', ['address.eth'])).rejects.toThrow('UnregisteredName: ens: Unregistered domain name BBrraadd.eth')
     })
   })
 
   describe('addr', () => {
     it('the addr of rr (.wallet .sol .eth .bnb .bit) is valid', async () => {
-      expect(await alldid.addr('leonx.bit', 'eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 300, "type": "address", "symbol": "ETH", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"})
-      expect(await alldid.addr('🍍.sol', 'eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "symbol": "ETH", "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"})
-      expect(await alldid.addr('leon.wallet', 'eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "symbol": "ETH", "value": "0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1"})
-      expect(await alldid.addr('leont.eth', 'eth')).toEqual({"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "symbol": "ETH", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"})
-      expect(await alldid.addr('leon.bnb', 'bnb')).toEqual({"key": "address.bnb", "label": "", "subtype": "bnb", "ttl": 0, "type": "address", "symbol": "BNB", "value": "0xec2F69E6EA001615297367b9F1B6c9e25f695E0a"})
+      expect(await alldid.addr('leonx.bit', 'eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 300, type: 'address', symbol: 'ETH', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' })
+      expect(await alldid.addr('🍍.sol', 'eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', symbol: 'ETH', value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6' })
+      expect(await alldid.addr('leon.wallet', 'eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', symbol: 'ETH', value: '0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1' })
+      expect(await alldid.addr('leont.eth', 'eth')).toEqual({ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', symbol: 'ETH', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' })
+      expect(await alldid.addr('leon.bnb', 'bnb')).toEqual({ key: 'address.bnb', label: '', subtype: 'bnb', ttl: 0, type: 'address', symbol: 'BNB', value: '0xec2F69E6EA001615297367b9F1B6c9e25f695E0a' })
     })
 
     it('the addr of rr (.crypto .sol .crypto .bnb .eth) is invalid', async () => {
@@ -174,11 +174,11 @@ describe('AllDID', () => {
 
   describe('addrs', () => {
     it('the addrs of eth (.wallet .sol .eth .bnb .bit) is valid', async () => {
-      expect(await alldid.addrs('leonx.bit', ['eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 300, "type": "address", "symbol": "ETH", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"}])
-      expect(await alldid.addrs('🍍.sol', ['eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "symbol": "ETH", "value": "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6"}])
-      expect(await alldid.addrs('leon.wallet', ['eth'])).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "symbol": "ETH", "value": "0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1"}])
-      expect(await alldid.addrs('leont.eth', 'eth')).toEqual([{"key": "address.eth", "label": "", "subtype": "eth", "ttl": 0, "type": "address", "symbol": "ETH", "value": "0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa"}])
-      expect(await alldid.addrs('leon.bnb', 'bnb')).toEqual([{"key": "address.bnb", "label": "", "subtype": "bnb", "ttl": 0, "type": "address", "symbol": "BNB", "value": "0xec2F69E6EA001615297367b9F1B6c9e25f695E0a"}])
+      expect(await alldid.addrs('leonx.bit', ['eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 300, type: 'address', symbol: 'ETH', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' }])
+      expect(await alldid.addrs('🍍.sol', ['eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', symbol: 'ETH', value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6' }])
+      expect(await alldid.addrs('leon.wallet', ['eth'])).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', symbol: 'ETH', value: '0x98e32b218bd1d8f3c267466b8d7635501dbdd1c1' }])
+      expect(await alldid.addrs('leont.eth', 'eth')).toEqual([{ key: 'address.eth', label: '', subtype: 'eth', ttl: 0, type: 'address', symbol: 'ETH', value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa' }])
+      expect(await alldid.addrs('leon.bnb', 'bnb')).toEqual([{ key: 'address.bnb', label: '', subtype: 'bnb', ttl: 0, type: 'address', symbol: 'BNB', value: '0xec2F69E6EA001615297367b9F1B6c9e25f695E0a' }])
     })
 
     it('the addrs of rr (.crypto .sol .crypto .bnb .eth) is invalid', async () => {
@@ -199,7 +199,7 @@ describe('AllDID', () => {
     })
 
     it('the registryAddress of rr (.crypto .sol .crypto .bnb .eth) is invalid', async () => {
-      await expect(alldid.registryAddress('leonx.bit')).rejects.toThrow(`UnsupportedMethod: Unsupported Method`)
+      await expect(alldid.registryAddress('leonx.bit')).rejects.toThrow('UnsupportedMethod: Unsupported Method')
     })
   })
 })

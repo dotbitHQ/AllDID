@@ -56,7 +56,7 @@ enum KeyPrefix {
   Profile= 'profile',
   Dweb = 'dweb',
   Text = 'text'
-} 
+}
 
 export class DotbitService extends NamingService {
   serviceName = 'dotbit'
@@ -82,7 +82,8 @@ export class DotbitService extends NamingService {
   async owner (name: string): Promise<string> {
     try {
       return await this.dotbit.accountInfo(name).then(info => info.owner_key)
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -91,7 +92,8 @@ export class DotbitService extends NamingService {
   async manager (name: string): Promise<string> {
     try {
       return await this.dotbit.accountInfo(name).then(info => info.manager_key)
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -111,11 +113,11 @@ export class DotbitService extends NamingService {
       else {
         return null
       }
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
-    
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
@@ -123,7 +125,8 @@ export class DotbitService extends NamingService {
       let records = await this.dotbit.records(name)
       records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
       return records.map(record => bitARE2RecordItem(record))
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -135,17 +138,18 @@ export class DotbitService extends NamingService {
       if (Array.isArray(keys)) {
         const dotbitAddrs = await this.dotbit.addrs(name)
         addrs = dotbitAddrs.filter(
-            record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
-          ).map(v => ({
-              ...bitARE2RecordItem(v),
-              symbol: v.subtype.toUpperCase()
-          }))
+          record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
+        ).map(v => ({
+          ...bitARE2RecordItem(v),
+          symbol: v.subtype.toUpperCase()
+        }))
       }
       else {
         addrs = await this.dotbit.addrs(name, keys.toUpperCase())
       }
       return addrs
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -161,7 +165,8 @@ export class DotbitService extends NamingService {
         }
       }
       return null
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -174,7 +179,8 @@ export class DotbitService extends NamingService {
         return null
       }
       return dweb.value
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -187,7 +193,8 @@ export class DotbitService extends NamingService {
         return []
       }
       return dwebs.map(dweb => (`${dweb.value}`))
-    } catch (e) {
+    }
+    catch (e) {
       if (e.code == BitIndexerErrorCode.AccountNotExist) this.throwUnregistered(name)
       throw e
     }
@@ -197,7 +204,7 @@ export class DotbitService extends NamingService {
     const coinType = CoinType[currencyTicker.toUpperCase()]
     if (!coinType) return null
     const keyInfo = {
-      coinType: coinType,
+      coinType,
       key: address,
     }
     const bitAccount = await this.dotbit.reverse(keyInfo)

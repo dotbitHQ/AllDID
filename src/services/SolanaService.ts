@@ -1,36 +1,36 @@
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { Connection, Commitment, ConnectionConfig, PublicKey } from '@solana/web3.js'
-import { 
-  getDomainKey, 
-  NameRegistryState, 
-  Record, 
-  getIpfsRecord, 
+import {
+  getDomainKey,
+  NameRegistryState,
+  Record,
+  getIpfsRecord,
   performReverseLookup,
   getAllDomains,
   resolve,
   NAME_TOKENIZER_ID,
   MINT_PREFIX
-} from "@bonfida/spl-name-service";
-import { AllDIDErrorCode } from '../errors/AllDIDError';
+} from '@bonfida/spl-name-service'
+import { AllDIDErrorCode } from '../errors/AllDIDError'
 
-export function createProvider(
+export function createProvider (
   endpoint: string,
   commitmentOrConfig?: Commitment | ConnectionConfig
 ): Connection {
   return new Connection(endpoint, commitmentOrConfig)
 }
 
-export type SolanaServiceOptions = {
+export interface SolanaServiceOptions {
   provider: Connection,
-  network: string
+  network: string,
 }
 
 function getDwebKeys () {
   return [
-    "IPFS",
-    "ARWV",
-    "SHDW",
-    "Url"
+    'IPFS',
+    'ARWV',
+    'SHDW',
+    'Url'
   ]
 }
 
@@ -44,12 +44,12 @@ function getTextKeys () {
 
 function getProfileKeys () {
   return [
-    "Email",
-    "Discord",
-    "Github",
-    "Reddit",
-    "Twitter",
-    "Telegram",
+    'Email',
+    'Discord',
+    'Github',
+    'Reddit',
+    'Twitter',
+    'Telegram',
   ]
 }
 
@@ -69,12 +69,11 @@ enum KeyPrefix {
   Profile= 'profile',
   Dweb = 'dweb',
   Text = 'text'
-} 
-
+}
 
 export class SolanaService extends NamingService {
   serviceName = 'solana'
-  
+
   provider: Connection
   constructor (options: SolanaServiceOptions) {
     super()
@@ -85,18 +84,18 @@ export class SolanaService extends NamingService {
     return /^.+\.sol$/.test(name)
   }
 
-  protected async isValidPubkey(pubkey: PublicKey): Promise<boolean> {
+  protected async isValidPubkey (pubkey: PublicKey): Promise<boolean> {
     const nameAccount = await this.provider.getAccountInfo(pubkey)
-    return nameAccount ? true : false
+    return !!nameAccount
   }
 
-  protected getSolAddress (data: Buffer ): string {
+  protected getSolAddress (data: Buffer): string {
     return new PublicKey(data.slice(0, 32)).toString()
   }
 
   async isRegistered (name: string): Promise<boolean> {
-    const { pubkey } = await getDomainKey(name);
-    return this.isValidPubkey(pubkey)
+    const { pubkey } = await getDomainKey(name)
+    return await this.isValidPubkey(pubkey)
   }
 
   async isAvailable (name: string): Promise<boolean> {
@@ -105,11 +104,11 @@ export class SolanaService extends NamingService {
 
   async owner (name: string): Promise<string> {
     await this.checkRegistered(name)
-    const { pubkey } = await getDomainKey(name);
+    const { pubkey } = await getDomainKey(name)
     const { registry, nftOwner } = await NameRegistryState.retrieve(
       this.provider,
       pubkey
-    );
+    )
     return nftOwner ? nftOwner.toString() : registry.owner.toString()
   }
 
@@ -120,11 +119,11 @@ export class SolanaService extends NamingService {
 
   // return MintAccount Address
   async tokenId (name: string): Promise<string> {
-    const { pubkey } = await getDomainKey(name);
+    const { pubkey } = await getDomainKey(name)
     const [mint] = await PublicKey.findProgramAddress(
       [MINT_PREFIX, pubkey.toBuffer()],
       NAME_TOKENIZER_ID
-    );
+    )
     return mint.toBase58()
   }
 
@@ -143,8 +142,8 @@ export class SolanaService extends NamingService {
   }
 
   protected makeRecordKey (subtype: string): string {
-    let textKey = subtype.slice(0, 1).toUpperCase() + subtype.slice(1).toLowerCase()
-    let addressKey = subtype.toUpperCase()
+    const textKey = subtype.slice(0, 1).toUpperCase() + subtype.slice(1).toLowerCase()
+    const addressKey = subtype.toUpperCase()
     const key = Record[textKey] ? Record[textKey] : (Record[addressKey] ? Record[addressKey] : null)
     if (!key) {
       return null
@@ -154,14 +153,14 @@ export class SolanaService extends NamingService {
 
   protected async getRecord (name: string, key: string): Promise<string | null> {
     await this.checkRegistered(name)
-    const { pubkey } = await getDomainKey(key + "." + name, true)
+    const { pubkey } = await getDomainKey(key + '.' + name, true)
     const isValidPubkey = await this.isValidPubkey(pubkey)
     if (!isValidPubkey) return null
 
-    let { registry } = await NameRegistryState.retrieve(this.provider, pubkey)
-  
-    const idx = registry.data?.indexOf(0x00);
-    const data = registry.data?.slice(0, idx);
+    const { registry } = await NameRegistryState.retrieve(this.provider, pubkey)
+
+    const idx = registry.data?.indexOf(0x00)
+    const data = registry.data?.slice(0, idx)
 
     return key === 'SOL' ? this.getSolAddress(data) : data.toString()
   }
@@ -185,7 +184,7 @@ export class SolanaService extends NamingService {
     }
     keys.forEach((key) => requestArray.push(this.record(name, key)))
     return (await Promise.all<RecordItem>(requestArray)).filter(v => v)
-  } 
+  }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
     let records = []
@@ -244,12 +243,12 @@ export class SolanaService extends NamingService {
     const addressKey = new PublicKey(address)
     const isValid = await this.isValidPubkey(addressKey)
     if (isValid) {
-      const domains = await getAllDomains(this.provider, addressKey);
+      const domains = await getAllDomains(this.provider, addressKey)
       reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
     }
     return reverse
   }
-  
+
   // https://bonfida.github.io/solana-name-service-guide/domain-name/domain-tld.html
   async registryAddress (name: string): Promise<string> {
     return '58PwtjSDuFHuUkYjH9BYnnQKHfwo9reZhC2zMJv9JPkx'

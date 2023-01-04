@@ -35,7 +35,7 @@ function getRegistrarAddress (networkId: string): string {
   // .bnb bsc testnet
   if ([97].includes(parseInt(networkId))) {
     return '0x888A2BA9787381000Cd93CA4bd23bB113f03C5Af'
-  } 
+  }
   // ens
   else if ([1, 3, 4, 5].includes(parseInt(networkId))) {
     return '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'
@@ -52,7 +52,7 @@ enum KeyPrefix {
   Profile= 'profile',
   Dweb = 'dweb',
   Text = 'text'
-} 
+}
 
 export class EnsService extends NamingService {
   serviceName = 'ens'
@@ -89,18 +89,18 @@ export class EnsService extends NamingService {
       'org.telegram',
     ]
   }
-  
+
   protected getAddressKeys (): string[] {
     return ['ETH', 'BTC', 'LTC', 'DOGE']
   }
 
   async isRegistered (name: string): Promise<boolean> {
-    let owner = await this.ens.name(name).getOwner()
-    return owner !== this.emptyAddress ? true : false
+    const owner = await this.ens.name(name).getOwner()
+    return owner !== this.emptyAddress
   }
 
   async isAvailable (name: string): Promise<boolean> {
-    return this.isRegistered(name).then((isRegistered) => !isRegistered)
+    return await this.isRegistered(name).then((isRegistered) => !isRegistered)
   }
 
   async owner (name: string): Promise<string> {
@@ -137,10 +137,10 @@ export class EnsService extends NamingService {
   }
 
   protected makeRecordKey (subtype: string): string {
-    let textKey = subtype.toLowerCase()
-    let addressKey = subtype.toUpperCase()
+    const textKey = subtype.toLowerCase()
+    const addressKey = subtype.toUpperCase()
     const key = this.getAddressKeys().find(v => v === addressKey) ? addressKey : this.getProfileKeys().find(v => v === textKey)
-    return key ? key : ''
+    return key || ''
   }
 
   protected async getText (name: string, subtype: string): Promise<string> {
@@ -164,7 +164,7 @@ export class EnsService extends NamingService {
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem | null> {
     await this.checkRegistered(name)
-    const recordItem = this.makeRecordItem(key);
+    const recordItem = this.makeRecordItem(key)
     const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
     if (value) {
       recordItem.value = value
@@ -195,7 +195,7 @@ export class EnsService extends NamingService {
       keys = this.getAddressKeys()
     }
     if (Array.isArray(keys)) {
-      const requestArray: Promise<RecordItemAddr>[] = []
+      const requestArray: Array<Promise<RecordItemAddr>> = []
       keys.forEach((key) => requestArray.push(this.addr(name, key)))
       const records = await Promise.all<RecordItemAddr>(requestArray)
       // filter null
