@@ -6,22 +6,21 @@ export function setInterceptor (service: any, errorType?: any, handler?: (e: Err
   })
 }
 
-export const AsyncFunction = async function () {}.constructor
-
 export class AllDIDInterceptor {
   // handler error
   constructor (public handler, public errorType?) {}
 
   apply (target, thisArg, argumentList) {
+    const promise = target.apply(thisArg, argumentList)
     // async method
-    if (target.apply(thisArg, argumentList).catch) {
-      return target.apply(thisArg, argumentList).catch(e => {
+    if (promise.catch) {
+      return promise.catch(e => {
         if (e instanceof this.errorType) {
           this.handler.call(thisArg, e)
         }
         else throw e
       })
     }
-    return target.apply(thisArg, argumentList)
+    return promise
   }
 }
