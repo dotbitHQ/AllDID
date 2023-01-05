@@ -86,7 +86,6 @@ describe('UnsService', () => {
               value: '1/erc1155:0xc7e5e9434f4a71e6db978bd65b4d61d3593e5f27/14317'
             },
             {
-<<<<<<< HEAD
               key: 'dweb.html_value',
               label: '',
               subtype: 'html_value',
@@ -117,38 +116,6 @@ describe('UnsService', () => {
               ttl: 0,
               type: 'profile',
               value: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'
-=======
-              key: 'profile.username',
-              label: '',
-              subtype: 'username',
-              ttl: 0,
-              type: 'profile',
-              value: '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c'
-            },
-            {
-              key: 'profile.public_key',
-              label: '',
-              subtype: 'public_key',
-              ttl: 0,
-              type: 'profile',
-              value: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'
-            },
-            {
-              key: 'dweb.html_value',
-              label: '',
-              subtype: 'html_value',
-              ttl: 0,
-              type: 'dweb',
-              value: 'QmTiqc12wo2pBsGa9XsbpavkhrjFiyuSWsKyffvZqVGtut'
-            },
-            {
-              key: 'dweb.redirect_domain_value',
-              label: '',
-              subtype: 'redirect_domain_value',
-              ttl: 0,
-              type: 'dweb',
-              value: 'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6'
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
             },
           ]
         )

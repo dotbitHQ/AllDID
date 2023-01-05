@@ -10,12 +10,8 @@ import {
   NAME_TOKENIZER_ID,
   MINT_PREFIX
 } from '@bonfida/spl-name-service'
-<<<<<<< HEAD
 import { AllDIDErrorCode, UnregisteredNameError, UnsupportedMethodError } from '../errors/AllDIDError'
 import { setInterceptor } from '../tools/ErrorInterceptor'
-=======
-import { AllDIDErrorCode } from '../errors/AllDIDError'
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
 
 export function createProvider (
   endpoint: string,
@@ -119,10 +115,6 @@ export class SolanaService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
-<<<<<<< HEAD
-=======
-    await this.checkRegistered(name)
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     const { pubkey } = await getDomainKey(name)
     const { registry, nftOwner } = await NameRegistryState.retrieve(
       this.provider,
@@ -171,23 +163,11 @@ export class SolanaService extends NamingService {
   }
 
   protected async getRecord (name: string, key: string): Promise<string | null> {
-<<<<<<< HEAD
     const { pubkey } = await getDomainKey(key + '.' + name, true)
     const { registry } = await NameRegistryState.retrieve(this.provider, pubkey)
 
     const idx = registry.data?.indexOf(0x00)
     const data: Buffer | undefined = registry.data?.slice(0, idx)
-=======
-    await this.checkRegistered(name)
-    const { pubkey } = await getDomainKey(key + '.' + name, true)
-    const isValidPubkey = await this.isValidPubkey(pubkey)
-    if (!isValidPubkey) return null
-
-    const { registry } = await NameRegistryState.retrieve(this.provider, pubkey)
-
-    const idx = registry.data?.indexOf(0x00)
-    const data = registry.data?.slice(0, idx)
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
 
     return key === 'SOL' && data ? this.getSolAddress(data) : (data?.toString() ?? null)
   }
@@ -212,13 +192,9 @@ export class SolanaService extends NamingService {
       keys = addressKeys.concat(profileKeys).concat(dwebKeys).concat(textKeys)
     }
     keys.forEach((key) => requestArray.push(this.record(name, key)))
-<<<<<<< HEAD
     const result = await Promise.all<RecordItem | null>(requestArray)
     result.forEach(v => { if (v !== null) records.push(v) })
     return records
-=======
-    return (await Promise.all<RecordItem>(requestArray)).filter(v => v)
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
@@ -271,18 +247,9 @@ export class SolanaService extends NamingService {
   // Solana address only
   async reverse (address: string): Promise<string | null> {
     const addressKey = new PublicKey(address)
-<<<<<<< HEAD
     const domains = await getAllDomains(this.provider, addressKey)
     let reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
     return reverse ?? null
-=======
-    const isValid = await this.isValidPubkey(addressKey)
-    if (isValid) {
-      const domains = await getAllDomains(this.provider, addressKey)
-      reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
-    }
-    return reverse
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   // https://bonfida.github.io/solana-name-service-guide/domain-name/domain-tld.html

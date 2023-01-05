@@ -27,13 +27,8 @@ export abstract class NamingService {
     }
   }
 
-<<<<<<< HEAD
   throwUnregistered (name?: string) {
     throw new UnregisteredNameError(this.serviceName)
-=======
-  throwUnregistered (name) {
-    throw new AllDIDError(`${this.serviceName}: Unregistered domain name ${name}`, AllDIDErrorCode.UnregisteredName)
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   protected throwError (message: string, code: AllDIDErrorCode) {

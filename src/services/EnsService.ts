@@ -148,11 +148,7 @@ export class EnsService extends NamingService {
     const textKey = subtype.toLowerCase()
     const addressKey = subtype.toUpperCase()
     const key = this.getAddressKeys().find(v => v === addressKey) ? addressKey : this.getProfileKeys().find(v => v === textKey)
-<<<<<<< HEAD
     return key ?? ''
-=======
-    return key || ''
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   protected async getText (name: string, subtype: string): Promise<string> {
@@ -175,10 +171,6 @@ export class EnsService extends NamingService {
 
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem | null> {
-<<<<<<< HEAD
-=======
-    await this.checkRegistered(name)
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     const recordItem = this.makeRecordItem(key)
     const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
     if (value) {
@@ -213,11 +205,7 @@ export class EnsService extends NamingService {
       keys = this.getAddressKeys()
     }
     if (Array.isArray(keys)) {
-<<<<<<< HEAD
       const requestArray: Array<Promise<RecordItemAddr | null>> = []
-=======
-      const requestArray: Array<Promise<RecordItemAddr>> = []
->>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
       keys.forEach((key) => requestArray.push(this.addr(name, key)))
       const records = await Promise.all<RecordItemAddr | null>(requestArray)
       records.forEach(v => {

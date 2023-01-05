@@ -6,6 +6,7 @@ import { SIDService } from './services/SIDService'
 import { DotbitExtensionService } from './services/DotbitExtensionService'
 import { SolanaService, SolanaServiceOptions, createProvider } from './services/SolanaService'
 import { UnsService, UnsServiceOptions } from './services/UnsService'
+import { ApiService, ApiServiceOptions } from './services/ApiService'
 
 export interface CreateInstanceOptions {
   'dotbit': DotbitServiceOptions,
@@ -50,5 +51,12 @@ export function createInstance (options = defaultCreateInstanceOptions) {
   alldid.installService(solanaService)
   alldid.installService(unsService)
 
+  return alldid
+}
+
+export function createLiteInstance (options: ApiServiceOptions) {
+  const alldid = new AllDID()
+  const apiService = new ApiService(options)
+  alldid.installService(apiService)
   return alldid
 }
