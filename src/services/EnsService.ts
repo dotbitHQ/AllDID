@@ -74,12 +74,12 @@ export class EnsService extends NamingService {
       address: getRegistrarAddress(options.networkId),
     })
 
-    setInterceptor(EnsService, AllDIDError, this.errorHandler)
+    setInterceptor(EnsService, Error, this.errorHandler)
   }
 
   protected errorHandler (error: any) {
     switch (error.code) {
-      case AllDIDErrorCode.UnregisteredName: throw new UnregisteredNameError(this.serviceName)
+      case 'CALL_EXCEPTION': throw new UnregisteredNameError(this.serviceName)
     }
     throw error
   }
@@ -114,13 +114,11 @@ export class EnsService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
-    await this.checkRegistered(name)
     const tokenID = await this.tokenId(name)
     return this.ensRegistrar.ownerOf(tokenID)
   }
 
   async manager (name: string): Promise<string> {
-    await this.checkRegistered(name)
     const address = await this.ens.name(name).getOwner()
     return address
   }
@@ -173,19 +171,17 @@ export class EnsService extends NamingService {
 
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem | null> {
-    await this.checkRegistered(name)
     const recordItem = this.makeRecordItem(key)
     const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
     if (value) {
       recordItem.value = value
       return recordItem
-    }
+    } 
     return null
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     const list: RecordItem[] = []
-    await this.checkRegistered(name)
     if (!keys) {
       const profileKeys = this.getProfileKeys().map((key) => `${KeyPrefix.Profile}.${key.toLowerCase()}`)
       const addressKeys = this.getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
@@ -205,7 +201,6 @@ export class EnsService extends NamingService {
     keys?: string | string[]
   ): Promise<RecordItemAddr[]> {
     const list: RecordItemAddr[] = []
-    await this.checkRegistered(name)
     if (!keys) {
       keys = this.getAddressKeys()
     }
@@ -225,7 +220,6 @@ export class EnsService extends NamingService {
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
-    await this.checkRegistered(name)
     const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
     const addressKey = this.makeRecordKey(key)
     if (addressKey) {
@@ -241,21 +235,19 @@ export class EnsService extends NamingService {
   }
 
   async dweb (name: string): Promise<string> {
-    await this.checkRegistered(name)
-    return this.ens.name(name).getContent()
+    return await this.ens.name(name).getContent()
   }
 
-  async dwebs (name: string, keys?: string | string[]): Promise<string[]> {
-    await this.checkRegistered(name)
+  async dwebs (name: string): Promise<string[]> {
     const contentHash = await this.dweb(name)
-    return [contentHash]
+    return contentHash ? [contentHash] : []
   }
 
   async reverse (
     address: string,
   ): Promise<string | null> {
     const { name } = await this.ens.getName(address)
-    return name
+    return name ?? null
   }
 
   registryAddress (name: string): Promise<string> {
