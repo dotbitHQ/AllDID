@@ -5,7 +5,7 @@ describe('SolanaService', () => {
   const solanaService = new SolanaService(defaultCreateInstanceOptions.solana)
 
   describe('isSupported', () => {
-    jest.setTimeout(30000);
+    jest.setTimeout(30000)
 
     it('support abc.sol', () => {
       expect(solanaService.isSupported('abc.sol')).toBe(true)
@@ -29,28 +29,28 @@ describe('SolanaService', () => {
 
     it('🍍.sol\'s ETH record is 0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6', async () => {
       expect(await solanaService.record('🍍.sol', 'address.eth')).toEqual(
-        { 
-          key: "address.eth",
-          label: "", 
-          subtype: "eth",
-          ttl: 0, 
-          type: "address", 
-          value: "0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6" 
-      })
+        {
+          key: 'address.eth',
+          label: '',
+          subtype: 'eth',
+          ttl: 0,
+          type: 'address',
+          value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6'
+        })
     })
 
     it('🍍.sol\'s addr is CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2', async () => {
       const address = await solanaService.addr('🍍.sol')
       expect(address).toEqual(
-        { 
-          key: "address.sol",
-          label: "", 
-          subtype: "sol",
-          ttl: 0, 
-          type: "address", 
-          value: "CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2",
-          symbol: "sol"
-      })
+        {
+          key: 'address.sol',
+          label: '',
+          subtype: 'sol',
+          ttl: 0,
+          type: 'address',
+          value: 'CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2',
+          symbol: 'sol'
+        })
     })
 
     it('🍍.sol\'s addrs is valid', async () => {
@@ -110,6 +110,5 @@ describe('SolanaService', () => {
     it('FvfD9ziv4CuPj5BSD278jy6sX8Q2GTZeQZNfQ89eE4P9\'s reverse is only1solana.sol', async () => {
       expect(await solanaService.reverse('FvfD9ziv4CuPj5BSD278jy6sX8Q2GTZeQZNfQ89eE4P9')).toEqual('only1solana.sol')
     })
-
   })
 })

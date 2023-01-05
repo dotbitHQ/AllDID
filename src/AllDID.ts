@@ -19,71 +19,71 @@ export class AllDID {
   }
 
   async asyncFindService (callback: (service: NamingService) => any): Promise<NamingService | null> {
-    for (let nameService of this.services) {
+    for (const nameService of this.services) {
       const item = await callback(nameService)
       if (item) return nameService
     }
+    return null
   }
 
   async isSupported (name: string): Promise<boolean> {
     const nameService = await this.asyncFindService(service => service.isSupported(name))
-    return nameService ? true : false
+    return !!nameService
   }
 
   async isRegistered (name: string): Promise<boolean> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.isRegistered(name)
+    return await service.isRegistered(name)
   }
 
   async isAvailable (name: string): Promise<boolean> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.isAvailable(name)
+    return await service.isAvailable(name)
   }
 
   async owner (name: string): Promise<string> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.owner(name)
+    return await service.owner(name)
   }
 
   async manager (name: string): Promise<string> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.manager(name)
+    return await service.manager(name)
   }
 
   async tokenId (name: string): Promise<string> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.tokenId(name)
+    return await service.tokenId(name)
   }
 
-  async record (name: string, key: string): Promise<RecordItem> {
+  async record (name: string, key: string): Promise<RecordItem | null> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.record(name, key)
+    return await service.record(name, key)
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.records(name, keys)
+    return await service.records(name, keys)
   }
 
   async addrs (name: string, filter?: string | string[]): Promise<RecordItemAddr[]> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.addrs(name, filter)
+    return await service.addrs(name, filter)
   }
 
-  async addr (name: string, filter?: string): Promise<RecordItemAddr> {
+  async addr (name: string, filter?: string): Promise<RecordItemAddr | null> {
     const service = await this.getServiceOrThrow(name)
 
-    return service.addr(name, filter)
+    return await service.addr(name, filter)
   }
-
 
   // async dweb (name: string): Promise<string> {
   //   const service = await this.getServiceOrThrow(name)
@@ -103,6 +103,6 @@ export class AllDID {
 
   async registryAddress (name: string): Promise<string> {
     const service = await this.getServiceOrThrow(name)
-    return service.registryAddress(name)
+    return await service.registryAddress(name)
   }
 }

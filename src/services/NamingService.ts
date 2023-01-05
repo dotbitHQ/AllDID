@@ -26,6 +26,7 @@ export abstract class NamingService {
       throw new UnsupportedNameError(this.serviceName)
     }
   }
+
   throwUnregistered (name?: string) {
     throw new UnregisteredNameError(this.serviceName)
   }

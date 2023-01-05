@@ -31,7 +31,7 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
     provider: createProvider('https://rpc.ankr.com/solana'),
     network: 'mainnet-beta'
   },
-  uns: undefined,
+  uns: {},
 }
 
 export function createInstance (options = defaultCreateInstanceOptions) {

@@ -48,7 +48,7 @@ export class DotbitService extends NamingService {
   }
 
   protected errorHandler (error: any) {
-    switch(error.code) {
+    switch (error.code) {
       case BitIndexerErrorCode.AccountNotExist: throw new UnregisteredNameError(this.serviceName)
       case BitIndexerErrorCode.AccountFormatInvalid: throw new UnsupportedNameError(this.serviceName)
     }
@@ -81,86 +81,84 @@ export class DotbitService extends NamingService {
   }
 
   async record (name: string, key: string): Promise<RecordItem | null> {
-      const records = await this.dotbit.records(name, key)
-      if (records.length > 0) {
-        return bitARE2RecordItem(records[0])
-      }
-      else {
-        return null
-      }
-    
-    
+    const records = await this.dotbit.records(name, key)
+    if (records.length > 0) {
+      return bitARE2RecordItem(records[0])
+    }
+    else {
+      return null
+    }
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
-      let records = await this.dotbit.records(name)
-      records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
-      return records.map(record => bitARE2RecordItem(record))
-  
+    let records = await this.dotbit.records(name)
+    records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
+    return records.map(record => bitARE2RecordItem(record))
   }
 
   async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
- 
-      let addrs = []
-      if (Array.isArray(keys)) {
-        const dotbitAddrs = await this.dotbit.addrs(name)
-        addrs = dotbitAddrs.filter(
-            record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
-          ).map(v => ({
-              ...bitARE2RecordItem(v),
-              symbol: v.subtype.toUpperCase()
-          }))
-      }
-      else {
-        addrs = await this.dotbit.addrs(name, keys.toUpperCase())
-      }
-      return addrs
-   
+    let addrs: RecordItemAddr[] = []
+    if (Array.isArray(keys)) {
+      const dotbitAddrs = await this.dotbit.addrs(name)
+      addrs = dotbitAddrs.filter(
+        record => keys.find(key => key.toUpperCase() === record.subtype.toUpperCase())
+      ).map(v => ({
+        ...bitARE2RecordItem(v),
+        symbol: v.subtype.toUpperCase()
+      }))
+    }
+    else {
+      const bitAddr = await this.dotbit.addrs(name, keys?.toUpperCase())
+      addrs = bitAddr.map(v => {
+        return {
+          ...bitARE2RecordItem(v),
+          symbol: v.subtype.toUpperCase()
+        }
+      })
+    }
+    return addrs
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
-      const addrs = await this.dotbit.addrs(name, key)
-      if (addrs.length > 0) {
-        return {
-          ...bitARE2RecordItem(addrs[0]),
-          symbol: addrs[0].subtype.toUpperCase()
-        }
+    const addrs = await this.dotbit.addrs(name, key)
+    if (addrs.length > 0) {
+      return {
+        ...bitARE2RecordItem(addrs[0]),
+        symbol: addrs[0].subtype.toUpperCase()
       }
-      return null
-   
+    }
+    return null
   }
 
   async dweb (name: string): Promise<any> {
-      const dweb = await this.dotbit.dweb(name)
-      if (!dweb) {
-        return null
-      }
-      return dweb.value
-    
+    const dweb = await this.dotbit.dweb(name)
+    if (!dweb) {
+      return null
+    }
+    return dweb.value
   }
 
   async dwebs (name: string, protocol?: string): Promise<string[]> {
-      const dwebs = await this.dotbit.dwebs(name, protocol)
-      if (!dwebs || dwebs.length <= 0) {
-        return []
-      }
-      return dwebs.map(dweb => (`${dweb.value}`))
-    
+    const dwebs = await this.dotbit.dwebs(name, protocol)
+    if (!dwebs || dwebs.length <= 0) {
+      return []
+    }
+    return dwebs.map(dweb => (`${dweb.value}`))
   }
 
   async reverse (address: string, currencyTicker: string): Promise<string | null> {
     const coinType = CoinType[currencyTicker.toUpperCase()]
     if (!coinType) return null
     const keyInfo = {
-      coinType: coinType,
+      coinType,
       key: address,
     }
     const bitAccount = await this.dotbit.reverse(keyInfo)
     return bitAccount?.account
   }
 
-  registryAddress (name: string): Promise<string> {
+  async registryAddress (name: string): Promise<string> {
     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod)
-    return null
+    return ''
   }
 }

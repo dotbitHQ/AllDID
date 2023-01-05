@@ -6,7 +6,7 @@ enum KeyPrefix {
   Profile= 'profile',
   Dweb = 'dweb',
   Text = 'text'
-} 
+}
 
 export class SIDService extends EnsService {
   serviceName = 'sid'
@@ -15,7 +15,7 @@ export class SIDService extends EnsService {
     return /^.+\.bnb$/.test(name)
   }
 
-  protected getAddressKeys(): string[] {
+  protected getAddressKeys (): string[] {
     const addressKeys = super.getAddressKeys()
     return addressKeys.concat('BNB')
   }

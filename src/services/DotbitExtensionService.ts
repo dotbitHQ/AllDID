@@ -2,12 +2,8 @@ import { DotbitService, DotbitServiceOptions } from './DotbitService'
 import { RecordItem, RecordItemAddr } from './NamingService'
 
 export class DotbitExtensionService extends DotbitService {
-  constructor (options: DotbitServiceOptions) {
-    super(options)
-  }
-
   protected nameTransfer (name: string) {
-    return name + "bit"
+    return name + 'bit'
   }
 
   isSupported (name: string): boolean {
@@ -63,7 +59,7 @@ export class DotbitExtensionService extends DotbitService {
     if (!reverseValue) return null
     const labels = reverseValue.split('.')
     labels.pop()
-    return labels.join(".")
+    return labels.join('.')
   }
 
   registryAddress (name: string): Promise<string> {
