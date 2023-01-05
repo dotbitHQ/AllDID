@@ -7,11 +7,11 @@ import {
   getIpfsRecord,
   performReverseLookup,
   getAllDomains,
-  resolve,
   NAME_TOKENIZER_ID,
   MINT_PREFIX
 } from '@bonfida/spl-name-service'
-import { AllDIDErrorCode } from '../errors/AllDIDError'
+import { AllDIDErrorCode, UnregisteredNameError, UnsupportedMethodError } from '../errors/AllDIDError'
+import { setInterceptor } from '../tools/ErrorInterceptor'
 
 export function createProvider (
   endpoint: string,
@@ -78,6 +78,18 @@ export class SolanaService extends NamingService {
   constructor (options: SolanaServiceOptions) {
     super()
     this.provider = options.provider
+
+    setInterceptor(SolanaService, Error, this.errorHandler)
+  }
+
+  protected errorHandler (error: any) {
+    const caseKey = error.code ?? error.message
+    switch (caseKey) {
+      case 'Invalid name account provided': throw new UnregisteredNameError(this.serviceName);
+      case AllDIDErrorCode.UnsupportedMethod: throw new UnsupportedMethodError(this.serviceName);
+    }
+    
+    throw error
   }
 
   isSupported (name: string): boolean {
@@ -103,7 +115,6 @@ export class SolanaService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
-    await this.checkRegistered(name)
     const { pubkey } = await getDomainKey(name)
     const { registry, nftOwner } = await NameRegistryState.retrieve(
       this.provider,
@@ -152,11 +163,7 @@ export class SolanaService extends NamingService {
   }
 
   protected async getRecord (name: string, key: string): Promise<string | null> {
-    await this.checkRegistered(name)
     const { pubkey } = await getDomainKey(key + '.' + name, true)
-    const isValidPubkey = await this.isValidPubkey(pubkey)
-    if (!isValidPubkey) return null
-
     const { registry } = await NameRegistryState.retrieve(this.provider, pubkey)
 
     const idx = registry.data?.indexOf(0x00)
@@ -217,7 +224,6 @@ export class SolanaService extends NamingService {
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
-    await this.checkRegistered(name)
     // solana queries addresses by querying records
     const recordItem = await this.record(name, `${KeyPrefix.Address}.${key}`)
     if (!recordItem) return null
@@ -228,11 +234,8 @@ export class SolanaService extends NamingService {
   }
 
   async dweb (name: string): Promise<string | null> {
-    let dweb
-    if (await this.isRegistered(name)) {
-      const { data } = await getIpfsRecord(this.provider, name)
-      dweb = data?.toString()
-    }
+    const { data } = await getIpfsRecord(this.provider, name)
+    let dweb = data?.toString()
     return dweb ?? null
   }
 
@@ -243,13 +246,9 @@ export class SolanaService extends NamingService {
 
   // Solana address only
   async reverse (address: string): Promise<string | null> {
-    let reverse
     const addressKey = new PublicKey(address)
-    const isValid = await this.isValidPubkey(addressKey)
-    if (isValid) {
-      const domains = await getAllDomains(this.provider, addressKey)
-      reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
-    }
+    const domains = await getAllDomains(this.provider, addressKey)
+    let reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
     return reverse ?? null
   }
 

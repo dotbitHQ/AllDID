@@ -27,7 +27,7 @@ describe('SolanaService', () => {
       expect(await solanaService.owner('leon.sol')).toBe('FvfD9ziv4CuPj5BSD278jy6sX8Q2GTZeQZNfQ89eE4P9')
     })
 
-    it('🍍.sol\'s ETH record is 0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6', async () => {
+    it('🍍.sol\'s ETH record is valid', async () => {
       expect(await solanaService.record('🍍.sol', 'address.eth')).toEqual(
         {
           key: 'address.eth',
@@ -39,8 +39,23 @@ describe('SolanaService', () => {
         })
     })
 
+    it('🍍.sol\'s ETH records is valid', async () => {
+      expect(await solanaService.records('🍍.sol', ['address.eth'])).toEqual(
+        [
+          {
+            key: 'address.eth',
+            label: '',
+            subtype: 'eth',
+            ttl: 0,
+            type: 'address',
+            value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6'
+          }
+        ]
+      )
+    })
+
     it('🍍.sol\'s addr is CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2', async () => {
-      const address = await solanaService.addr('🍍.sol')
+      const address = await solanaService.addr('🍍.sol', 'sol')
       expect(address).toEqual(
         {
           key: 'address.sol',
@@ -49,7 +64,7 @@ describe('SolanaService', () => {
           ttl: 0,
           type: 'address',
           value: 'CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2',
-          symbol: 'sol'
+          symbol: 'SOL'
         })
     })
 
@@ -59,7 +74,7 @@ describe('SolanaService', () => {
           key: 'address.eth',
           type: 'address',
           subtype: 'eth',
-          symbol: 'eth',
+          symbol: 'ETH',
           label: '',
           value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6',
           ttl: 0
@@ -68,7 +83,7 @@ describe('SolanaService', () => {
           key: 'address.btc',
           type: 'address',
           subtype: 'btc',
-          symbol: 'btc',
+          symbol: 'BTC',
           label: '',
           value: '3JfBcjv7TbYN9yQsyfcNeHGLcRjgoHhV3z',
           ttl: 0
@@ -77,7 +92,7 @@ describe('SolanaService', () => {
           key: 'address.sol',
           type: 'address',
           subtype: 'sol',
-          symbol: 'sol',
+          symbol: 'SOL',
           label: '',
           value: 'CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2',
           ttl: 0
@@ -86,7 +101,7 @@ describe('SolanaService', () => {
           key: 'address.ltc',
           type: 'address',
           subtype: 'ltc',
-          symbol: 'ltc',
+          symbol: 'LTC',
           label: '',
           value: 'MK6deR3Mi6dUsim9M3GPDG2xfSeSAgSrpQ',
           ttl: 0
@@ -95,7 +110,7 @@ describe('SolanaService', () => {
           key: 'address.doge',
           type: 'address',
           subtype: 'doge',
-          symbol: 'doge',
+          symbol: 'DOGE',
           label: '',
           value: 'DC79kjg58VfDZeMj9cWNqGuDfYfGJg9DjZ',
           ttl: 0
