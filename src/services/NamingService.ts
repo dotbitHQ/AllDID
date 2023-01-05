@@ -1,4 +1,4 @@
-import { AllDIDError, AllDIDErrorCode } from '../errors/AllDIDError'
+import { AllDIDError, AllDIDErrorCode, UnsupportedNameError, UnregisteredNameError } from '../errors/AllDIDError'
 
 export interface RecordItem {
   key: string, // full key, like `address.60`
@@ -23,11 +23,11 @@ export abstract class NamingService {
 
   throwIfNotSupported (name: string) {
     if (!this.isSupported(name)) {
-      throw new AllDIDError(`${this.serviceName} do not supported ${name}`, AllDIDErrorCode.DidIsNotSupported)
+      throw new UnsupportedNameError(this.serviceName)
     }
   }
-  throwUnregistered (name) {
-    throw new AllDIDError(`${this.serviceName}: Unregistered domain name ${name}`, AllDIDErrorCode.UnregisteredName)
+  throwUnregistered (name?: string) {
+    throw new UnregisteredNameError(this.serviceName)
   }
 
   protected throwError (message: string, code: AllDIDErrorCode) {
@@ -36,7 +36,7 @@ export abstract class NamingService {
 
   protected async checkRegistered (name: string) {
     if (!(await this.isRegistered(name))) {
-      this.throwUnregistered(name)
+      this.throwUnregistered()
     }
   }
 
