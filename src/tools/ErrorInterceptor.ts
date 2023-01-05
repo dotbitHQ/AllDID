@@ -16,7 +16,7 @@ export class AllDIDInterceptor {
     if (promise.catch) {
       return promise.catch(e => {
         if (e instanceof this.errorType) {
-          this.handler.call(thisArg, e)
+          return this.handler.call(thisArg, e)
         }
         else throw e
       })
