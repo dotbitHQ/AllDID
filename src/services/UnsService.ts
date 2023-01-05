@@ -1,6 +1,14 @@
-import UNS, { SourceConfig, NamingServiceName, ResolutionErrorCode } from '@unstoppabledomains/resolution'
+import 
+  UNS, 
+{ 
+  SourceConfig, 
+  NamingServiceName, 
+  ResolutionErrorCode, 
+  ResolutionError,
+} from '@unstoppabledomains/resolution'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
-import { AllDIDErrorCode } from '../errors/AllDIDError'
+import { AllDIDError, AllDIDErrorCode, UnregisteredNameError, UnsupportedMethodError, UnsupportedNameError } from '../errors/AllDIDError'
+import { setInterceptor } from '../tools/ErrorInterceptor'
 
 export type UnsServiceOptions = SourceConfig
 
@@ -88,46 +96,35 @@ export class UnsService extends NamingService {
   constructor (options: UnsServiceOptions) {
     super()
     this.uns = new UNS({ sourceConfig: options })
+
+    setInterceptor(UnsService, Error, this.errorHandler)
+  }
+
+  protected errorHandler (error: any) {
+    switch (error.code) {
+      case AllDIDErrorCode.UnsupportedMethod: throw new UnsupportedMethodError(this.serviceName)
+      case ResolutionErrorCode.UnsupportedDomain: throw new UnsupportedNameError(this.serviceName)
+      case ResolutionErrorCode.UnregisteredDomain: throw new UnregisteredNameError(this.serviceName)
+      case ResolutionErrorCode.RecordNotFound: return null
+    }
+    throw error
   }
 
   async isSupported (name: string): Promise<boolean> {
-    try {
-      const isSupported = await this.uns.isSupportedDomain(name)
-      return isSupported
-    }
-    catch (e) {
-      if (
-        e.code === ResolutionErrorCode.InvalidDomainAddress ||
-        e.code === ResolutionErrorCode.UnsupportedDomain
-      ) return false
-      throw e
-    }
+    return await this.uns.isSupportedDomain(name)
   }
 
   async isRegistered (name: string): Promise<boolean> {
-    try {
-      return await this.uns.isRegistered(name)
-    }
-    catch (e) {
-      if (e.code === ResolutionErrorCode.UnregisteredDomain) return false
-      throw e
-    }
+    return await this.uns.isRegistered(name)
   }
 
-  isAvailable (name: string): Promise<boolean> {
-    return this.uns.isAvailable(name)
+  async isAvailable (name: string): Promise<boolean> {
+    return await this.uns.isAvailable(name)
   }
 
   async owner (name: string): Promise<string> {
-    try {
-      const owner = await this.uns.owner(name)
-      return owner ?? ''
-    }
-    catch (e) {
-      console.log(e.code)
-      if (e.code === ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
-      throw e
-    }
+    const owner = await this.uns.owner(name)
+    return owner ?? ''
   }
 
   async manager (name: string): Promise<string> {
@@ -144,14 +141,7 @@ export class UnsService extends NamingService {
   async record (name: string, key: string): Promise<RecordItem | null> {
     const recordItem = makeRecordItem(key)
     const unsKey = allDIDKeyToUnsKey(key)
-    try {
-      recordItem.value = await this.uns.record(name, unsKey)
-    }
-    catch (e) {
-      if (e.code === ResolutionErrorCode.RecordNotFound) return null
-      if (e.code === ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
-      throw e
-    }
+    recordItem.value = await this.uns.record(name, unsKey)
     return recordItem
   }
 
@@ -209,14 +199,7 @@ export class UnsService extends NamingService {
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
     const recordItem = makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
-    try {
-      recordItem.value = await this.uns.addr(name, key)
-    }
-    catch (e) {
-      if (e.code === ResolutionErrorCode.RecordNotFound) return null
-      if (e.code === ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
-      throw e
-    }
+    recordItem.value = await this.uns.addr(name, key)
     return {
       ...recordItem,
       symbol: recordItem.subtype.toUpperCase()
@@ -224,26 +207,13 @@ export class UnsService extends NamingService {
   }
 
   async dweb (name: string): Promise<string> {
-    try {
-      return await this.uns.ipfsHash(name)
-    }
-    catch (e) {
-      if (e.code === ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
-      throw e
-    }
+    return await this.uns.ipfsHash(name)
   }
 
   async dwebs (name: string): Promise<string[]> {
     let records: Record<string, string>
-    try {
-      records = await this.uns.records(name, getDwebKeys())
-    }
-    catch (e) {
-      if (e.code === ResolutionErrorCode.RecordNotFound) return []
-      if (e.code === ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
-      throw e
-    }
-    return Object.values(records).filter(v => v)
+    records = await this.uns.records(name, getDwebKeys())
+    return records ? Object.values(records).filter(v => v) : []
   }
 
   reverse (address: string): Promise<string | null> {

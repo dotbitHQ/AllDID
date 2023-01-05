@@ -7,8 +7,8 @@ describe('UnsService', () => {
   describe('isSupported', () => {
     jest.setTimeout(30000)
 
-    it('support Brad.crypto', () => {
-      expect(unsService.isSupported('Brad.crypto')).toBe(true)
+    it('support Brad.crypto', async () => {
+      expect(await unsService.isSupported('Brad.crypto')).toBe(true)
     })
 
     it('do not support Brad.eth', () => {
@@ -25,6 +25,10 @@ describe('UnsService', () => {
 
     it('Brad.crypto\'s owner is 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8', async () => {
       expect(await unsService.owner('Brad.crypto')).toEqual('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8')
+    })
+
+    it('Brad.crypto\'s manager is unsupported', async () => {
+      await expect(unsService.manager('Brad.crypto')).rejects.toThrow('UnsupportedMethod: uns - Unsupported method')
     })
 
     it('Brad.crypto\'s tokenId is 0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9', async () => {
@@ -82,22 +86,6 @@ describe('UnsService', () => {
               value: '1/erc1155:0xc7e5e9434f4a71e6db978bd65b4d61d3593e5f27/14317'
             },
             {
-              key: 'profile.username',
-              label: '',
-              subtype: 'username',
-              ttl: 0,
-              type: 'profile',
-              value: '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c'
-            },
-            {
-              key: 'profile.public_key',
-              label: '',
-              subtype: 'public_key',
-              ttl: 0,
-              type: 'profile',
-              value: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'
-            },
-            {
               key: 'dweb.html_value',
               label: '',
               subtype: 'html_value',
@@ -112,6 +100,22 @@ describe('UnsService', () => {
               ttl: 0,
               type: 'dweb',
               value: 'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6'
+            },
+            {
+              key: 'profile.username',
+              label: '',
+              subtype: 'username',
+              ttl: 0,
+              type: 'profile',
+              value: '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c'
+            },
+            {
+              key: 'profile.public_key',
+              label: '',
+              subtype: 'public_key',
+              ttl: 0,
+              type: 'profile',
+              value: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'
             },
           ]
         )
