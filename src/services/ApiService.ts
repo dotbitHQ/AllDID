@@ -2,8 +2,8 @@ import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { Networking } from '../tools/networking'
 
 export interface ApiServiceOptions {
-    baseUri: string,
-    network: string
+  baseUrl: string,
+  network: string,
 }
 
 export function createLiteInstance (options: ApiServiceOptions) {
@@ -16,63 +16,75 @@ export class ApiService extends NamingService {
 
   constructor (options: ApiServiceOptions) {
     super()
-    this.api = new Networking(options.baseUri)
+    this.api = new Networking(options.baseUrl)
   }
 
   async isSupported (name: string): Promise<boolean> {
-    const res = await this.api.get('/')
-    return null
+    return await this.api.get(`api/v1/name/${name}/check/supported`)
   }
 
-  isRegistered (name: string): Promise<boolean> {
-    return null
+  async isRegistered (name: string): Promise<boolean> {
+    return await this.api.get(`api/v1/name/${name}/check/registered`)
   }
 
-  isAvailable (name: string): Promise<boolean> {
-    return null
+  async isAvailable (name: string): Promise<boolean> {
+    return await this.api.get(`api/v1/name/${name}/check/available`)
   }
 
-  owner (name: string): Promise<string> {
-    return null
+  async owner (name: string): Promise<string> {
+    return await this.api.get(`api/v1/name/${name}/owner`)
   }
 
-  manager (name: string): Promise<string> {
-    return null
+  async manager (name: string): Promise<string> {
+    return await this.api.get(`api/v1/name/${name}/manager`)
   }
 
-  tokenId (name: string): Promise<string> {
-    return null
+  async tokenId (name: string): Promise<string> {
+    return await this.api.get(`api/v1/name/${name}/tokenid`)
   }
 
-  record (name: string, key: string): Promise<RecordItem | null> {
-    return null
+  async record (name: string, key: string): Promise<RecordItem | null> {
+    const records = await this.api.get(`api/v1/name/${name}/records?keys=${encodeURIComponent(JSON.stringify([key]))}`)
+    return records.length > 0 ? records[0] : null
   }
 
-  records (name: string, keys?: string[]): Promise<RecordItem[]> {
-    return null
+  async records (name: string, keys?: string[]): Promise<RecordItem[]> {
+    const records = await this.api.get(`api/v1/name/${name}/records?keys=${encodeURIComponent(JSON.stringify(keys || []))}`)
+    return records
   }
 
-  addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
-    return null
+  async addrs (name: string, keys?: string | string[]): Promise<RecordItemAddr[]> {
+    const addrs = await this.api.get(
+      `api/v1/name/${name}/addrs?keys=${encodeURIComponent(JSON.stringify(keys || []))}`
+    )
+    return addrs
   }
 
-  addr (name: string, currencyTicker: string): Promise<RecordItemAddr | null> {
-    return null
+  async addr (name: string, currencyTicker: string): Promise<RecordItemAddr | null> {
+    const addrs = await this.api.get(
+      `api/v1/name/${name}/addrs?keys=${encodeURIComponent(JSON.stringify([currencyTicker]))}`
+    )
+    return addrs.length > 0 ? addrs[0] : null
   }
 
-  dweb (name: string): Promise<string | null> {
-    return null
-  }
+  // todo
+  // dweb (name: string): Promise<string | null> {
+  //   return null
+  // }
 
-  dwebs (name: string): Promise<string[]> {
-    return null
-  }
+  // todo
+  // dwebs (name: string): Promise<string[]> {
+  //   return null
+  // }
 
+  // todo
   async reverse (address: string, currencyTicker: string): Promise<string | null> {
     return null
   }
 
-  registryAddress (name: string): Promise<string> {
-    return null
+  async registryAddress (name: string): Promise<string> {
+    return await this.api.get(
+      `api/v1/name/${name}/registry`
+    )
   }
 }
