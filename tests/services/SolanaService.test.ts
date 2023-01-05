@@ -37,6 +37,7 @@ describe('SolanaService', () => {
           type: 'address',
           value: '0x570eDC13f9D406a2b4E6477Ddf75D5E9cCF51cd6'
         })
+<<<<<<< HEAD
     })
 
     it('🍍.sol\'s ETH records is valid', async () => {
@@ -52,6 +53,8 @@ describe('SolanaService', () => {
           }
         ]
       )
+=======
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     })
 
     it('🍍.sol\'s addr is CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2', async () => {
@@ -64,7 +67,11 @@ describe('SolanaService', () => {
           ttl: 0,
           type: 'address',
           value: 'CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2',
+<<<<<<< HEAD
           symbol: 'SOL'
+=======
+          symbol: 'sol'
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
         })
     })
 

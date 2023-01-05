@@ -20,9 +20,15 @@ const domainExtensionToNamingServiceName = {
 function findNamingServiceName (
   domain: string,
 ): NamingServiceName {
+<<<<<<< HEAD
   const extension: string | undefined = domain.split('.').pop()
 
   if (extension && extension in domainExtensionToNamingServiceName) {
+=======
+  const extension = domain.split('.').pop()
+
+  if (extension in domainExtensionToNamingServiceName) {
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     return domainExtensionToNamingServiceName[extension]
   }
   else {
@@ -51,8 +57,13 @@ function allDIDKeyToUnsKey (key: string): string {
     case KeyPrefix.Address: unsKey = `crypto.${keys[1].toUpperCase()}.address`; break
     case KeyPrefix.Dweb: unsKey = `dweb.${keys[1].toLowerCase()}.hash`; break
     case KeyPrefix.Profile:
+<<<<<<< HEAD
       if (keys[1] === 'picture') unsKey = 'social.picture.value'
       if (keys[1] === 'email' || keys[1] === 'for_sale' || keys[1] === 'url') {
+=======
+      if (keys[1] == 'picture') unsKey = 'social.picture.value'
+      if (keys[1] == 'email' || keys[1] == 'for_sale' || keys[1] == 'url') {
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
         unsKey = `whois.${keys[1]}.value`
       }
       break
@@ -100,12 +111,26 @@ export class UnsService extends NamingService {
     setInterceptor(UnsService, Error, this.errorHandler)
   }
 
+<<<<<<< HEAD
   protected errorHandler (error: any) {
     switch (error.code) {
       case AllDIDErrorCode.UnsupportedMethod: throw new UnsupportedMethodError(this.serviceName)
       case ResolutionErrorCode.UnsupportedDomain: throw new UnsupportedNameError(this.serviceName)
       case ResolutionErrorCode.UnregisteredDomain: throw new UnregisteredNameError(this.serviceName)
       case ResolutionErrorCode.RecordNotFound: return null
+=======
+  async isSupported (name: string): Promise<boolean> {
+    try {
+      const isSupported = await this.uns.isSupportedDomain(name)
+      return isSupported
+    }
+    catch (e) {
+      if (
+        e.code === ResolutionErrorCode.InvalidDomainAddress ||
+        e.code === ResolutionErrorCode.UnsupportedDomain
+      ) return false
+      throw e
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     }
     throw error
   }
@@ -115,7 +140,17 @@ export class UnsService extends NamingService {
   }
 
   async isRegistered (name: string): Promise<boolean> {
+<<<<<<< HEAD
     return await this.uns.isRegistered(name)
+=======
+    try {
+      return await this.uns.isRegistered(name)
+    }
+    catch (e) {
+      if (e.code === ResolutionErrorCode.UnregisteredDomain) return false
+      throw e
+    }
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   async isAvailable (name: string): Promise<boolean> {
@@ -123,8 +158,19 @@ export class UnsService extends NamingService {
   }
 
   async owner (name: string): Promise<string> {
+<<<<<<< HEAD
     const owner = await this.uns.owner(name)
     return owner ?? ''
+=======
+    try {
+      return await this.uns.owner(name)
+    }
+    catch (e) {
+      console.log(e.code)
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   async manager (name: string): Promise<string> {
@@ -141,7 +187,18 @@ export class UnsService extends NamingService {
   async record (name: string, key: string): Promise<RecordItem | null> {
     const recordItem = makeRecordItem(key)
     const unsKey = allDIDKeyToUnsKey(key)
+<<<<<<< HEAD
     recordItem.value = await this.uns.record(name, unsKey)
+=======
+    try {
+      recordItem.value = await this.uns.record(name, unsKey)
+    }
+    catch (e) {
+      if (e.code == ResolutionErrorCode.RecordNotFound) return null
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     return recordItem
   }
 
@@ -199,7 +256,18 @@ export class UnsService extends NamingService {
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
     const recordItem = makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
+<<<<<<< HEAD
     recordItem.value = await this.uns.addr(name, key)
+=======
+    try {
+      recordItem.value = await this.uns.addr(name, key)
+    }
+    catch (e) {
+      if (e.code == ResolutionErrorCode.RecordNotFound) return null
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
     return {
       ...recordItem,
       symbol: recordItem.subtype.toUpperCase()
@@ -207,13 +275,35 @@ export class UnsService extends NamingService {
   }
 
   async dweb (name: string): Promise<string> {
+<<<<<<< HEAD
     return await this.uns.ipfsHash(name)
+=======
+    try {
+      return await this.uns.ipfsHash(name)
+    }
+    catch (e) {
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   async dwebs (name: string): Promise<string[]> {
     let records: Record<string, string>
+<<<<<<< HEAD
     records = await this.uns.records(name, getDwebKeys())
     return records ? Object.values(records).filter(v => v) : []
+=======
+    try {
+      records = await this.uns.records(name, getDwebKeys())
+    }
+    catch (e) {
+      if (e.code == ResolutionErrorCode.RecordNotFound) return []
+      if (e.code == ResolutionErrorCode.UnregisteredDomain) this.throwUnregistered(name)
+      throw e
+    }
+    return Object.values(records).filter(v => v)
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   }
 
   reverse (address: string): Promise<string | null> {

@@ -71,6 +71,7 @@ describe('ENSService', () => {
           ttl: 0,
           type: 'address',
           value: '0xC72B6f66017246d6A7f159F5C2BF358188AD9ECa'
+<<<<<<< HEAD
         })
       })
 
@@ -93,6 +94,16 @@ describe('ENSService', () => {
         const name = await ensService.registryAddress('leont.eth')
         expect(name).toEqual('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e')
       })
+=======
+        }
+      ])
+    })
+
+    it('leont.eth\'s registryAddress is valid', async () => {
+      const name = await ensService.registryAddress('leont.eth')
+      expect(name).toEqual('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e')
+    })
+>>>>>>> e416421b4904479b3ee76b8ca09c17adec9c3157
   })
 
   describe('reverse', () => {
