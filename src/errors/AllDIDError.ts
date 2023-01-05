@@ -3,6 +3,10 @@ export enum AllDIDErrorCode {
   UnsupportedMethod = 'UnsupportedMethod',
   RecordNotFound = 'RecordNotFound',
   UnregisteredName = 'UnregisteredName',
+
+  // ApiService errorCode
+  InvalidParameter = 'InvalidParameter',
+  Unknown = 'Unknown'
 }
 
 export class AllDIDError extends Error {
@@ -32,5 +36,17 @@ export class UnsupportedNameError extends AllDIDError {
 export class UnsupportedMethodError extends AllDIDError {
   constructor (serviceName: string) {
     super(`${serviceName} - Unsupported method`, AllDIDErrorCode.UnsupportedMethod)
+  }
+}
+
+export class InvalidParameterError extends AllDIDError {
+  constructor (serviceName: string) {
+    super(`${serviceName} - Invalid parameter`, AllDIDErrorCode.InvalidParameter)
+  }
+}
+
+export class UnknownError extends AllDIDError {
+  constructor (serviceName: string, message?: string) {
+    super(`${serviceName} - ${ message ?? 'Unknown error' }`, AllDIDErrorCode.Unknown)
   }
 }

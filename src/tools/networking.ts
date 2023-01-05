@@ -1,10 +1,22 @@
 import { fetch } from 'cross-fetch'
+import { UnregisteredNameError, UnsupportedNameError, RecordNotFoundError, InvalidParameterError, UnknownError } from '../errors/AllDIDError'
 
 export class Networking {
+  static serviceName = 'api'
   constructor (public baseUri: string) {
   }
 
   throwOnError (res: any) {
+    switch (res.code) {
+      case 4000: throw new InvalidParameterError(Networking.serviceName)
+      case 4001: throw new UnregisteredNameError(Networking.serviceName)
+      case 4002: throw new RecordNotFoundError(Networking.serviceName)
+      case 4003: throw new UnsupportedNameError(Networking.serviceName)
+      
+      case 500:
+      case 5000: throw new UnknownError(Networking.serviceName, res.msg)
+    }
+
     return res
   }
 

@@ -1,5 +1,4 @@
 import { createLiteInstance } from '../../src/createInstance'
-import { ApiService } from '../../src/services/ApiService'
 
 describe('ApiService', () => {
 

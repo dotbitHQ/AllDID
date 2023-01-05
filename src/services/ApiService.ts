@@ -6,10 +6,6 @@ export interface ApiServiceOptions {
   network: string,
 }
 
-export function createLiteInstance (options: ApiServiceOptions) {
-  return new ApiService(options)
-}
-
 export class ApiService extends NamingService {
   serviceName = 'api'
   api: Networking
