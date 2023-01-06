@@ -7,6 +7,7 @@ export class Networking {
   }
 
   throwOnError (res: any) {
+    // refer to https://github.com/dotbitHQ/AllDID/blob/main/docs/ApiService.md
     switch (res.code) {
       case 4000: throw new InvalidParameterError(Networking.serviceName)
       case 4001: throw new UnregisteredNameError(Networking.serviceName)
