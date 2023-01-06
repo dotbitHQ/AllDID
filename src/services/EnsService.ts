@@ -3,7 +3,8 @@ import { ethers, Contract } from 'ethers'
 import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
-import { AllDIDErrorCode } from '../errors/AllDIDError'
+import { AllDIDError, AllDIDErrorCode, UnregisteredNameError, UnsupportedNameError } from '../errors/AllDIDError'
+import { setInterceptor } from '../tools/ErrorInterceptor'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider,
@@ -35,7 +36,7 @@ function getRegistrarAddress (networkId: string): string {
   // .bnb bsc testnet
   if ([97].includes(parseInt(networkId))) {
     return '0x888A2BA9787381000Cd93CA4bd23bB113f03C5Af'
-  } 
+  }
   // ens
   else if ([1, 3, 4, 5].includes(parseInt(networkId))) {
     return '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'
@@ -52,7 +53,7 @@ enum KeyPrefix {
   Profile= 'profile',
   Dweb = 'dweb',
   Text = 'text'
-} 
+}
 
 export class EnsService extends NamingService {
   serviceName = 'ens'
@@ -72,6 +73,15 @@ export class EnsService extends NamingService {
       provider: options.provider,
       address: getRegistrarAddress(options.networkId),
     })
+
+    setInterceptor(EnsService, Error, this.errorHandler)
+  }
+
+  protected errorHandler (error: any) {
+    switch (error.code) {
+      case 'CALL_EXCEPTION': throw new UnregisteredNameError(this.serviceName)
+    }
+    throw error
   }
 
   isSupported (name: string): boolean {
@@ -89,28 +99,26 @@ export class EnsService extends NamingService {
       'org.telegram',
     ]
   }
-  
+
   protected getAddressKeys (): string[] {
     return ['ETH', 'BTC', 'LTC', 'DOGE']
   }
 
   async isRegistered (name: string): Promise<boolean> {
-    let owner = await this.ens.name(name).getOwner()
-    return owner !== this.emptyAddress ? true : false
+    const owner = await this.ens.name(name).getOwner()
+    return owner !== this.emptyAddress
   }
 
   async isAvailable (name: string): Promise<boolean> {
-    return this.isRegistered(name).then((isRegistered) => !isRegistered)
+    return await this.isRegistered(name).then((isRegistered) => !isRegistered)
   }
 
   async owner (name: string): Promise<string> {
-    await this.checkRegistered(name)
     const tokenID = await this.tokenId(name)
     return this.ensRegistrar.ownerOf(tokenID)
   }
 
   async manager (name: string): Promise<string> {
-    await this.checkRegistered(name)
     const address = await this.ens.name(name).getOwner()
     return address
   }
@@ -137,10 +145,10 @@ export class EnsService extends NamingService {
   }
 
   protected makeRecordKey (subtype: string): string {
-    let textKey = subtype.toLowerCase()
-    let addressKey = subtype.toUpperCase()
+    const textKey = subtype.toLowerCase()
+    const addressKey = subtype.toUpperCase()
     const key = this.getAddressKeys().find(v => v === addressKey) ? addressKey : this.getProfileKeys().find(v => v === textKey)
-    return key ? key : ''
+    return key ?? ''
   }
 
   protected async getText (name: string, subtype: string): Promise<string> {
@@ -163,52 +171,55 @@ export class EnsService extends NamingService {
 
   // key: type.subtype -> 'address.eth','text.email'
   async record (name: string, key: string): Promise<RecordItem | null> {
-    await this.checkRegistered(name)
-    const recordItem = this.makeRecordItem(key);
+    const recordItem = this.makeRecordItem(key)
     const value = await this.getRecord(name, recordItem.type, recordItem.subtype)
     if (value) {
       recordItem.value = value
       return recordItem
-    }
+    } 
     return null
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
-    await this.checkRegistered(name)
+    const list: RecordItem[] = []
     if (!keys) {
       const profileKeys = this.getProfileKeys().map((key) => `${KeyPrefix.Profile}.${key.toLowerCase()}`)
       const addressKeys = this.getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
       keys = profileKeys.concat(addressKeys)
     }
-    const requestArray: Array<Promise<RecordItem>> = []
+    const requestArray: Array<Promise<RecordItem | null>> = []
     keys.forEach((key) => requestArray.push(this.record(name, key)))
-    const result = await Promise.all<RecordItem>(requestArray)
-    return result.filter(v => v)
+    const result = await Promise.all<RecordItem | null>(requestArray)
+    result.forEach(v => {
+      if (v !== null) list.push(v)
+    })
+    return list
   }
 
   async addrs (
     name: string,
     keys?: string | string[]
   ): Promise<RecordItemAddr[]> {
-    await this.checkRegistered(name)
+    const list: RecordItemAddr[] = []
     if (!keys) {
       keys = this.getAddressKeys()
     }
     if (Array.isArray(keys)) {
-      const requestArray: Promise<RecordItemAddr>[] = []
+      const requestArray: Array<Promise<RecordItemAddr | null>> = []
       keys.forEach((key) => requestArray.push(this.addr(name, key)))
-      const records = await Promise.all<RecordItemAddr>(requestArray)
-      // filter null
-      return records.filter(v => v)
+      const records = await Promise.all<RecordItemAddr | null>(requestArray)
+      records.forEach(v => {
+        if (v !== null) list.push(v)
+      })
     }
     else {
       const recordAddr = await this.addr(name, keys)
-      return recordAddr ? [recordAddr] : []
+      recordAddr && list.push(recordAddr)
     }
+    return list
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
-    await this.checkRegistered(name)
     const recordItem = this.makeRecordItem(`${KeyPrefix.Address}.${key.toLowerCase()}`)
     const addressKey = this.makeRecordKey(key)
     if (addressKey) {
@@ -224,21 +235,19 @@ export class EnsService extends NamingService {
   }
 
   async dweb (name: string): Promise<string> {
-    await this.checkRegistered(name)
-    return this.ens.name(name).getContent()
+    return await this.ens.name(name).getContent()
   }
 
-  async dwebs (name: string, keys?: string | string[]): Promise<string[]> {
-    await this.checkRegistered(name)
+  async dwebs (name: string): Promise<string[]> {
     const contentHash = await this.dweb(name)
-    return [contentHash]
+    return contentHash ? [contentHash] : []
   }
 
   async reverse (
     address: string,
   ): Promise<string | null> {
     const { name } = await this.ens.getName(address)
-    return name
+    return name ?? null
   }
 
   registryAddress (name: string): Promise<string> {
