@@ -6,7 +6,7 @@ export enum AllDIDErrorCode {
 
   // ApiService errorCode
   InvalidParameter = 'InvalidParameter',
-  Unknown = 'Unknown'
+  Unknown = 'Unknown',
 }
 
 export class AllDIDError extends Error {
