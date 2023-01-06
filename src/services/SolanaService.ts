@@ -11,7 +11,7 @@ import {
   MINT_PREFIX
 } from '@bonfida/spl-name-service'
 import { AllDIDErrorCode, UnregisteredNameError, UnsupportedMethodError } from '../errors/AllDIDError'
-import { setInterceptor } from '../tools/ErrorInterceptor'
+import { setInterceptor } from '../errors/ErrorInterceptor'
 
 export function createProvider (
   endpoint: string,

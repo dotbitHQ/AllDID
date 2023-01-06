@@ -4,7 +4,7 @@ import { Provider, ExternalProvider } from '@ethersproject/providers'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { abi as RegistrarContract } from '@ensdomains/ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json'
 import { AllDIDError, AllDIDErrorCode, UnregisteredNameError, UnsupportedNameError } from '../errors/AllDIDError'
-import { setInterceptor } from '../tools/ErrorInterceptor'
+import { setInterceptor } from '../errors/ErrorInterceptor'
 
 export interface EnsServiceOptions {
   provider: Provider | ExternalProvider,

@@ -8,7 +8,7 @@ import
 } from '@unstoppabledomains/resolution'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { AllDIDError, AllDIDErrorCode, UnregisteredNameError, UnsupportedMethodError, UnsupportedNameError } from '../errors/AllDIDError'
-import { setInterceptor } from '../tools/ErrorInterceptor'
+import { setInterceptor } from '../errors/ErrorInterceptor'
 
 export type UnsServiceOptions = SourceConfig
 
