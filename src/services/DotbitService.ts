@@ -13,7 +13,7 @@ import {
 } from 'dotbit'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { AllDIDErrorCode, UnregisteredNameError, UnsupportedNameError } from '../errors/AllDIDError'
-import { setInterceptor } from '../tools/ErrorInterceptor'
+import { setInterceptor } from '../errors/ErrorInterceptor'
 export interface DotbitServiceOptions {
   network?: BitNetwork,
   bitIndexerUri?: string,
