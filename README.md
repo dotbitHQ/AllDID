@@ -10,6 +10,7 @@
 ## Table of Contents
 - [Features](#features)
 - [Getting Started](#getting-started)
+- [API Documentation](#api-documentation)
 - [CHANGELOG](#changelog)
 - [Plugins](#plugins)
 - [FAQ](#faq)
