@@ -1,3 +1,8 @@
 module.exports = {
-  extends: 'blockabc/typescript',
-}
+  extends: ["blockabc/typescript"],
+  plugins: [
+    "prettier",
+
+    // 其它插件
+  ],
+};
