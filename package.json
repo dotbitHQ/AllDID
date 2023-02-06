@@ -67,8 +67,8 @@
     "@siddomains/sidjs": "^0.1.17",
     "@solana/web3.js": "1.67.0",
     "@unstoppabledomains/resolution": "^8.3.3",
+    "cross-fetch": "^3.1.5",
     "dotbit": "^0.4.13",
-    "ethers": "^5.7.2",
-    "isomorphic-fetch": "^3.0.0"
+    "ethers": "^5.7.2"
   }
 }

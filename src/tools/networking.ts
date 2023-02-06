@@ -1,4 +1,3 @@
-import request from 'isomorphic-fetch'
 import { UnregisteredNameError, UnsupportedNameError, RecordNotFoundError, InvalidParameterError, UnknownError, UnsupportedMethodError } from '../errors/AllDIDError'
 
 // https://github.com/trycourier/courier-node/pull/110
@@ -6,6 +5,7 @@ import { UnregisteredNameError, UnsupportedNameError, RecordNotFoundError, Inval
 
 export class Networking {
   static serviceName = 'api'
+  public request
   constructor (public baseUri: string) {
   }
 
@@ -25,8 +25,9 @@ export class Networking {
     return res
   }
 
-  get (path: string) {
-    return request(this.baseUri + '/' + path, {
+  async get (path: string) {
+    this.request ? '' : this.request = await import('cross-fetch')
+    return this.request(this.baseUri + '/' + path, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -34,8 +35,9 @@ export class Networking {
     }).then(res => res.json()).then(this.throwOnError)
   }
 
-  post (path: string, body?: any) {
-    return request(this.baseUri + '/' + path, {
+  async post (path: string, body?: any) {
+    this.request ? '' : this.request = await import('cross-fetch')
+    return this.request(this.baseUri + '/' + path, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
