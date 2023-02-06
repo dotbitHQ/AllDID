@@ -1,3 +1,4 @@
+import { fetch } from 'cross-fetch'
 import { UnregisteredNameError, UnsupportedNameError, RecordNotFoundError, InvalidParameterError, UnknownError, UnsupportedMethodError } from '../errors/AllDIDError'
 
 // https://github.com/trycourier/courier-node/pull/110
@@ -26,8 +27,7 @@ export class Networking {
   }
 
   async get (path: string) {
-    this.request ? '' : this.request = await import('cross-fetch')
-    return this.request(this.baseUri + '/' + path, {
+    return fetch(this.baseUri + '/' + path, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -36,8 +36,7 @@ export class Networking {
   }
 
   async post (path: string, body?: any) {
-    this.request ? '' : this.request = await import('cross-fetch')
-    return this.request(this.baseUri + '/' + path, {
+    return fetch(this.baseUri + '/' + path, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
