@@ -1,5 +1,8 @@
-import { fetch } from 'cross-fetch'
+import { fetch as crossFetch } from 'cross-fetch'
 import { UnregisteredNameError, UnsupportedNameError, RecordNotFoundError, InvalidParameterError, UnknownError, UnsupportedMethodError } from '../errors/AllDIDError'
+
+// https://github.com/trycourier/courier-node/pull/110
+const fetch = globalThis.fetch ?? crossFetch
 
 export class Networking {
   static serviceName = 'api'
