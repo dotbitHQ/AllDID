@@ -1,6 +1,6 @@
 {
   "name": "alldid",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The all-in-one DID SDK, resolving all decentralized name(Web3 Name).",
   "author": "Jeff Jing <https://github.com/zgayjjf>",
   "license": "MIT",
