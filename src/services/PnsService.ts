@@ -1,23 +1,25 @@
-import { SDK as PNSSDK } from "pns-sdk";
-import second, { Chains } from "pns-sdk/lib/constants";
-import { setInterceptor } from "../errors/ErrorInterceptor";
-import { NamingService, RecordItem, RecordItemAddr } from "./NamingService";
-
-import type { Signer } from "@ethersproject/abstract-signer";
-import { AllDIDErrorCode } from "src/errors/AllDIDError";
 import { ethers } from "ethers";
+import { SDK as PNSSDK } from "pns-sdk";
+import { Chains } from "pns-sdk/lib/constants";
+
+import { setInterceptor } from "../errors/ErrorInterceptor";
+import { AllDIDErrorCode, UnsupportedMethodError } from "../errors/AllDIDError";
+import { NamingService, RecordItem, RecordItemAddr } from "./NamingService";
 import { makeRecordItem } from "./UnsService";
 
+import type { Signer } from "@ethersproject/abstract-signer";
+
+export type PnsNetworkType = 1284 | 1287;
 export interface PnsServiceOptions {
   pnsAddress: string;
-  controllerAdddress: string;
+  controllerAddress: string;
   signer: Signer;
 }
 
-export const defaultPnsNetworkId = "1284";
+export const defaultPnsNetworkId: PnsNetworkType = 1287;
 
 export const PnsProvider = new ethers.providers.JsonRpcProvider(
-  Chains[defaultPnsNetworkId].rpc
+  Chains[defaultPnsNetworkId].rpc[0]
 );
 
 export class PnsService extends NamingService {
@@ -28,7 +30,7 @@ export class PnsService extends NamingService {
     super();
     this.pns = new PNSSDK(
       options.pnsAddress,
-      options.controllerAdddress,
+      options.controllerAddress,
       options.signer
     );
 
@@ -36,17 +38,10 @@ export class PnsService extends NamingService {
   }
 
   protected errorHandler(error: any) {
-    // switch (error.code) {
-    //   case AllDIDErrorCode.UnsupportedMethod:
-    //     throw new UnsupportedMethodError(this.serviceName);
-    //   case ResolutionErrorCode.UnsupportedDomain:
-    //     throw new UnsupportedNameError(this.serviceName);
-    //   case ResolutionErrorCode.UnregisteredDomain:
-    //     throw new UnregisteredNameError(this.serviceName);
-    //   case ResolutionErrorCode.RecordNotFound:
-    //     return null;
-    // }
-    throw error;
+    switch (error.code) {
+      case AllDIDErrorCode.UnsupportedMethod:
+        throw new UnsupportedMethodError(this.serviceName);
+    }
   }
 
   isSupported(name: string): boolean {
@@ -57,15 +52,17 @@ export class PnsService extends NamingService {
     return this.pns.exists(name);
   }
 
+  // TODO: confirm available logic
   async isAvailable(name: string): Promise<boolean> {
-    //   TODO: conform available logic
     return this.pns.available(name);
   }
 
   async owner(name: string): Promise<string> {
     return this.pns.ownerOfName(name);
   }
-
+  // TODO: just mock the coding style like uns service to solve errors situation
+  // TODO: it's not a good coding style that throw a error after return a value
+  // TODO: it's better to update NamingService function's type？
   async manager(name: string): Promise<string> {
     this.throwError("Unsupported Method", AllDIDErrorCode.UnsupportedMethod);
     return "";
@@ -75,10 +72,8 @@ export class PnsService extends NamingService {
     return this.pns.namehash(name);
   }
 
-  // key: 'address.${Uns key}'
   async record(name: string, key: string): Promise<RecordItem | null> {
     const recordItem = makeRecordItem(key);
-
     recordItem.value = await this.pns.getKey(name, key);
     return recordItem;
   }
@@ -96,12 +91,12 @@ export class PnsService extends NamingService {
     name: string,
     keys?: string | string[]
   ): Promise<RecordItemAddr[]> {
-    // TODO: what's addrs mean
+    this.throwError("Unsupported Method", AllDIDErrorCode.UnsupportedMethod);
     return Promise.resolve([]);
   }
 
   async addr(name: string, key: string): Promise<RecordItemAddr | null> {
-    // TODO: what's addrs mean
+    this.throwError("Unsupported Method", AllDIDErrorCode.UnsupportedMethod);
     return Promise.resolve(null);
   }
 
@@ -116,8 +111,6 @@ export class PnsService extends NamingService {
   }
 
   reverse(address: string): Promise<string | null> {
-    //   TODO: it's mean born ???
-
     this.throwError("Unsupported Method", AllDIDErrorCode.UnsupportedMethod);
     return Promise.resolve(null);
   }
@@ -126,6 +119,5 @@ export class PnsService extends NamingService {
     // const loginAddress = PnsProvider.getSigner().getAddress();
     this.throwError("Unsupported Method", AllDIDErrorCode.UnsupportedMethod);
     return "";
-    // return await this.pns.register(name, loginAddress, 365 * 86400, 1, [], []);
   }
 }

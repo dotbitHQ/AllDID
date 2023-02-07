@@ -66,8 +66,8 @@ export const defaultCreateInstanceOptions: CreateInstanceOptions = {
   // },
   pns: {
     pnsAddress: ContractAddrMap[defaultPnsNetworkId].pns,
-    controllerAdddress: ContractAddrMap[defaultPnsNetworkId].controller,
-    signer: PnsProvider.getSigner(),
+    controllerAddress: ContractAddrMap[defaultPnsNetworkId].controller,
+    signer: PnsProvider.getSigner(ethers.constants.AddressZero),
   },
 };
 
