@@ -85,10 +85,10 @@ export class SolanaService extends NamingService {
   protected errorHandler (error: any) {
     const caseKey = error.code ?? error.message
     switch (caseKey) {
-      case 'Invalid name account provided': throw new UnregisteredNameError(this.serviceName);
-      case AllDIDErrorCode.UnsupportedMethod: throw new UnsupportedMethodError(this.serviceName);
+      case 'Invalid name account provided': throw new UnregisteredNameError(this.serviceName)
+      case AllDIDErrorCode.UnsupportedMethod: throw new UnsupportedMethodError(this.serviceName)
     }
-    
+
     throw error
   }
 
@@ -182,7 +182,7 @@ export class SolanaService extends NamingService {
   }
 
   async records (name: string, keys?: string[]): Promise<RecordItem[]> {
-    let records: RecordItem[] = []
+    const records: RecordItem[] = []
     const requestArray: Array<Promise<RecordItem | null>> = []
     if (!keys) {
       const addressKeys = getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
@@ -193,7 +193,9 @@ export class SolanaService extends NamingService {
     }
     keys.forEach((key) => requestArray.push(this.record(name, key)))
     const result = await Promise.all<RecordItem | null>(requestArray)
-    result.forEach(v => { if (v !== null) records.push(v) })
+    result.forEach(v => {
+      if (v !== null) records.push(v)
+    })
     return records
   }
 
@@ -235,7 +237,7 @@ export class SolanaService extends NamingService {
 
   async dweb (name: string): Promise<string | null> {
     const { data } = await getIpfsRecord(this.provider, name)
-    let dweb = data?.toString()
+    const dweb = data?.toString()
     return dweb ?? null
   }
 
@@ -248,7 +250,7 @@ export class SolanaService extends NamingService {
   async reverse (address: string): Promise<string | null> {
     const addressKey = new PublicKey(address)
     const domains = await getAllDomains(this.provider, addressKey)
-    let reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
+    const reverse = domains.length > 0 ? (await performReverseLookup(this.provider, domains[0])) + '.sol' : null
     return reverse ?? null
   }
 
