@@ -1,10 +1,16 @@
-// import { EnsService } from "./EnsService";
-// import { Provider } from "@ethersproject/providers";
-// import { setupSNS } from "sns-app-contract-api";
-// import { SNS } from "sns-app-contract-api/src/sns";
-// import { SNSResolver } from "sns-app-contract-api/src/sns.resolver";
-// import { RecordItemAddr } from "./NamingService";
-// import { setInterceptor } from "../errors/ErrorInterceptor";
+// /*
+//    this package is not supported on Node environment
+// */
+// import { EnsService } from './EnsService';
+// import { Provider } from '@ethersproject/providers';
+// import { setupSNS } from 'sns-app-contract-api';
+// import { SNSResolver } from 'sns-app-contract-api/src/sns.resolver';
+// import { NamingService, RecordItem, RecordItemAddr } from './NamingService';
+// import { setInterceptor } from '../errors/ErrorInterceptor';
+// import {
+//   AllDIDErrorCode,
+//   UnsupportedMethodError,
+// } from 'src/errors/AllDIDError';
 
 // export interface SnsServiceOptions {
 //   networkId: string;
@@ -22,26 +28,24 @@
 //   content: null; // custom content
 // }
 
-// export class SnsService extends EnsService {
-//   serviceName = "sns";
+// export class SnsService extends NamingService {
+//   serviceName = 'sns';
 
 //   sns: any;
 //   snsResolver: SNSResolver;
 //   constructor(options: SnsServiceOptions) {
-//     super({ networkId: options.networkId, provider: options.provider });
+//     super();
 //     const { sns, snsResolver } = setupSNS({ ...options });
-//     this.sns = new setupSNS();
+//     this.sns = sns;
 //     this.snsResolver = snsResolver;
 //     setInterceptor(SnsService, Error, this.errorHandler);
 //   }
 
 //   protected errorHandler(error: any) {
-//     // switch (error.code) {
-//     //   case BitIndexerErrorCode.AccountNotExist:
-//     //     throw new UnregisteredNameError(this.serviceName);
-//     //   case BitIndexerErrorCode.AccountFormatInvalid:
-//     //     throw new UnsupportedNameError(this.serviceName);
-//     // }
+//     switch (error.code) {
+//       case AllDIDErrorCode.UnsupportedMethod:
+//         throw new UnsupportedMethodError(this.serviceName);
+//     }
 //     throw error;
 //   }
 
@@ -53,42 +57,59 @@
 //     return this.sns.recordExists(name);
 //   }
 
-//   //   async isAvailable(name: string): Promise<boolean> {}
+//   async isAvailable(name: string): Promise<boolean> {}
 
 //   async owner(name: string): Promise<string> {
 //     return this.sns.getResolverOwner(name);
 //   }
 
-//   //   async manager(name: string): Promise<string> {}
+//   async manager(name: string): Promise<string> {}
 
 //   async tokenId(name: string): Promise<string> {
 //     return this.sns.getTokenIdOfName(name);
 //   }
 
 //   //  e.g:+xxx+yyy+zz+++aaa+b+
-//   //   async record(name: string, key: string): Promise<string | null> {
-//   //     return await this.snsResolver.getAllProperties(name);
-//   //   }
+//   async record(name: string, key: string): Promise<RecordItem | null> {
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return null;
+//   }
 
-//   //   async records(name: string, keys?: string[]): Promise<RecordItem[]> {}
+//   async records(name: string, keys?: string[]): Promise<RecordItem[]> {
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return [];
+//   }
 
 //   async addrs(
 //     name: string,
 //     keys?: string | string[]
 //   ): Promise<RecordItemAddr[]> {
-//     const addrResults = await this.sns.getDomainDetails(name);
-//     return [addrResults];
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return [];
 //   }
 
-//   //   async addr(name: string, key: string) {}
+//   async addr(name: string, key: string): Promise<RecordItemAddr | null> {
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return null;
+//   }
 
-//   //   async dweb(name: string) {}
+//   async dweb(name: string) {
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return '';
+//   }
 
-//   //   async dwebs(name: string) {}
+//   async dwebs(name: string) {
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return '';
+//   }
 
-//   //   reverse(address: string): Promise<string | null> {}
+//   reverse(address: string): Promise<string | null> {
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return Promise.resolve(null);
+//   }
 
 //   registryAddress(name: string): Promise<string> {
-//     return this.sns.registry(name);
+//     this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod);
+//     return Promise.resolve('');
 //   }
 // }

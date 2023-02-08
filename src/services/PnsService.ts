@@ -18,9 +18,17 @@ export interface PnsServiceOptions {
 
 export const defaultPnsNetworkId: PnsNetworkType = 1287
 
+enum PnsKeyPrefix {
+  Address = 'address',
+}
+
 export const PnsProvider = new ethers.providers.JsonRpcProvider(
   Chains[defaultPnsNetworkId].rpc[0]
 )
+
+function getAddressKeys (): string[] {
+  return ['ETH', 'BTC']
+}
 
 export class PnsService extends NamingService {
   serviceName = 'pns'
@@ -75,31 +83,51 @@ export class PnsService extends NamingService {
   }
 
   async record (name: string, key: string): Promise<RecordItem | null> {
-    const recordItem = makeRecordItem(key)
-    recordItem.value = await this.pns.getKey(name, key)
+    const recordItem = makeRecordItem(
+      `${PnsKeyPrefix.Address}.${key.toLowerCase()}`
+    )
+    recordItem.value = await this.pns.getKey(name, key.toUpperCase())
     return recordItem
   }
 
   async records (name: string, keys: string[]): Promise<RecordItem[]> {
-    const records = await this.pns.getKeys(name, keys)
-    return records.map((record, index) => {
-      const recordItem = makeRecordItem(keys[index])
-      recordItem.value = keys[index]
+    const records = await this.pns.getKeys(
+      name,
+      keys.map((item) => item.toUpperCase())
+    )
+    const recordsFormat = records.map((record, index) => {
+      const recordItem = makeRecordItem(
+        `${PnsKeyPrefix.Address}.${keys[index].toLowerCase()}`
+      )
+      recordItem.value = record
       return recordItem
     })
+    return recordsFormat
   }
 
-  async addrs (
-    name: string,
-    keys?: string | string[]
-  ): Promise<RecordItemAddr[]> {
-    this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod)
-    return await Promise.resolve([])
+  async addrs (name: string, keys?: string[]): Promise<RecordItemAddr[]> {
+    if (!keys) {
+      keys = getAddressKeys()
+    }
+
+    const records = await this.records(name, keys)
+    const addrs: RecordItemAddr[] = records.map((item, index) => {
+      return {
+        ...item,
+        symbol: (keys as string[])[index].toUpperCase(),
+      }
+    })
+    return addrs
   }
 
   async addr (name: string, key: string): Promise<RecordItemAddr | null> {
-    this.throwError('Unsupported Method', AllDIDErrorCode.UnsupportedMethod)
-    return await Promise.resolve(null)
+    const record = await this.record(name, key)
+    return record
+      ? {
+        ...record,
+        symbol: key.toUpperCase(),
+      }
+      : null
   }
 
   async dweb (name: string): Promise<string> {

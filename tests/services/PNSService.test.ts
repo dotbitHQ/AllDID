@@ -35,19 +35,67 @@ describe('PnsService', () => {
 
     it('gavinwood000.dot record key=ETH', async () => {
       expect(await pnsService.record('gavin000.dot', 'ETH')).toEqual({
-        key: 'ETH',
+        key: 'address.eth',
         label: '',
-        subtype: '',
+        subtype: 'eth',
         ttl: 0,
-        type: '',
+        type: 'address',
         value: '',
       })
     })
 
     it('gavinwood000.dot records key includes BTC,ETH', async () => {
       expect(await pnsService.records('gavin000.dot', ['BTC', 'ETH'])).toEqual([
-        { key: 'BTC', label: '', subtype: '', ttl: 0, type: '', value: 'BTC' },
-        { key: 'ETH', label: '', subtype: '', ttl: 0, type: '', value: 'ETH' },
+        {
+          key: 'address.btc',
+          label: '',
+          subtype: 'btc',
+          ttl: 0,
+          type: 'address',
+          value: '',
+        },
+        {
+          key: 'address.eth',
+          label: '',
+          subtype: 'eth',
+          ttl: 0,
+          type: 'address',
+          value: '',
+        },
+      ])
+    })
+
+    it('gavinwood000.dot addr key=ETH', async () => {
+      expect(await pnsService.addr('gavin000.dot', 'ETH')).toEqual({
+        key: 'address.eth',
+        label: '',
+        subtype: 'eth',
+        ttl: 0,
+        symbol: 'ETH',
+        type: 'address',
+        value: '',
+      })
+    })
+    it('gavinwood000.dot addrs key=ETH,BTC', async () => {
+      expect(await pnsService.addrs('gavin000.dot', ['ETH', 'BTC'])).toEqual([
+        {
+          key: 'address.eth',
+          label: '',
+          subtype: 'eth',
+          ttl: 0,
+          symbol: 'ETH',
+          type: 'address',
+          value: '',
+        },
+        {
+          key: 'address.btc',
+          label: '',
+          subtype: 'btc',
+          ttl: 0,
+          symbol: 'BTC',
+          type: 'address',
+          value: '',
+        },
       ])
     })
   })
