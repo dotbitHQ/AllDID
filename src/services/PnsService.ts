@@ -7,7 +7,7 @@ import { AllDIDErrorCode, UnsupportedMethodError } from '../errors/AllDIDError'
 import { NamingService, RecordItem, RecordItemAddr } from './NamingService'
 import { makeRecordItem } from './UnsService'
 
-import type { Signer } from '@ethersproject/abstract-signer'
+import type { Signer } from 'ethers'
 
 export type PnsNetworkType = 1284 | 1287
 export interface PnsServiceOptions {
