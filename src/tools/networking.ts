@@ -17,7 +17,7 @@ export class Networking {
       case 4002: throw new RecordNotFoundError(Networking.serviceName)
       case 4003: throw new UnsupportedNameError(Networking.serviceName)
       case 4004: throw new UnsupportedMethodError(Networking.serviceName)
-      
+
       case 500:
       case 5000: throw new UnknownError(Networking.serviceName, res.msg)
     }

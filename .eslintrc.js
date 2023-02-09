@@ -1,3 +1,3 @@
 module.exports = {
-  extends: 'blockabc/typescript',
-}
+  extends: ['blockabc/typescript'],
+};

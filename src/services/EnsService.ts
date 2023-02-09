@@ -176,7 +176,7 @@ export class EnsService extends NamingService {
     if (value) {
       recordItem.value = value
       return recordItem
-    } 
+    }
     return null
   }
 

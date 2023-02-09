@@ -47,6 +47,6 @@ export class InvalidParameterError extends AllDIDError {
 
 export class UnknownError extends AllDIDError {
   constructor (serviceName: string, message?: string) {
-    super(`${serviceName} - ${ message ?? 'Unknown error' }`, AllDIDErrorCode.Unknown)
+    super(`${serviceName} - ${message ?? 'Unknown error'}`, AllDIDErrorCode.Unknown)
   }
 }

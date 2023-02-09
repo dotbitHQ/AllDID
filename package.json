@@ -48,6 +48,7 @@
     "url": "https://github.com/dotbitHQ/AllDID/issues"
   },
   "devDependencies": {
+    "@jest/globals": "^29.4.1",
     "@types/jest": "^28.1.2",
     "@types/node": "^18.0.0",
     "eslint": "8.22.0",
@@ -69,6 +70,8 @@
     "@unstoppabledomains/resolution": "^8.3.3",
     "cross-fetch": "^3.1.5",
     "dotbit": "^0.4.13",
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "pns-sdk": "^0.8.0",
+    "sns-app-contract-api": "^1.1.25"
   }
 }
