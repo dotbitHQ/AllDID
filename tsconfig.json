@@ -17,7 +17,8 @@
     "strictNullChecks": true,
     "baseUrl": "./",
     "outDir": "./lib",
-    "paths": {}
+    "paths": {},
+    "skipLibCheck": true
   },
 
   "include": [

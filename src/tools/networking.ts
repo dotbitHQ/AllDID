@@ -1,11 +1,12 @@
-import { fetch as crossFetch } from 'cross-fetch'
+import { fetch } from 'cross-fetch'
 import { UnregisteredNameError, UnsupportedNameError, RecordNotFoundError, InvalidParameterError, UnknownError, UnsupportedMethodError } from '../errors/AllDIDError'
 
 // https://github.com/trycourier/courier-node/pull/110
-const fetch = globalThis.fetch ?? crossFetch
+// const request = fetch ?? crossFetch
 
 export class Networking {
   static serviceName = 'api'
+  public request
   constructor (public baseUri: string) {
   }
 
@@ -25,7 +26,7 @@ export class Networking {
     return res
   }
 
-  get (path: string) {
+  async get (path: string) {
     return fetch(this.baseUri + '/' + path, {
       method: 'GET',
       headers: {
@@ -34,7 +35,7 @@ export class Networking {
     }).then(res => res.json()).then(this.throwOnError)
   }
 
-  post (path: string, body?: any) {
+  async post (path: string, body?: any) {
     return fetch(this.baseUri + '/' + path, {
       method: 'POST',
       headers: {
