@@ -1,11 +1,22 @@
 import { AllDIDError, AllDIDErrorCode } from './errors/AllDIDError'
+import { PluginTemplate } from './PluginTemplate'
 import { NamingService, RecordItem, RecordItemAddr } from './services/NamingService'
 
 export class AllDID {
   services: NamingService[] = []
+  plugins: PluginTemplate[] = []
 
   installService (service: NamingService) {
-    this.services.push(service)
+    if (!this.services.includes(service)) {
+      this.services.push(service)
+    }
+  }
+
+  installPlugin (plugin: PluginTemplate) {
+    if (!this.plugins.includes(plugin)) {
+      plugin?.onInstall(this)
+      this.plugins.push(plugin)
+    }
   }
 
   async getServiceOrThrow (name: string) {

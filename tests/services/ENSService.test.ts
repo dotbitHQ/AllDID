@@ -35,7 +35,7 @@ describe('ENSService', () => {
       expect(tokenId).toEqual('0x341104cc982fbc19bb9076dbf7c842bf288cb7eaa42e23d66f80c02021f4a56e')
     })
 
-    it("leont.eth\'s profile record", async () => {
+    it('leont.eth\'s profile record', async () => {
       const record = await ensService.record('leont.eth', 'profile.keywords')
       expect(record).toEqual({
         key: 'profile.keywords',
@@ -45,6 +45,18 @@ describe('ENSService', () => {
         value: 'noway',
         ttl: 0
       })
+    })
+
+    it('leont.eth\'s profile records', async () => {
+      const records = await ensService.records('leont.eth', 'profile.keywords')
+      expect(records).toEqual([{
+        key: 'profile.keywords',
+        type: 'profile',
+        subtype: 'keywords',
+        label: '',
+        value: 'noway',
+        ttl: 0
+      }])
     })
 
     it("leont.eth's text records", async () => {

@@ -22,12 +22,12 @@
     "lint:fix": "eslint \"{src,example,packages,scripts,tests}/**/*.ts\" --fix"
   },
   "keywords": [
-    "dotbit",
-    ".bit",
     "DID",
     "Decentralized Identity",
     "web3",
     "blockchain",
+    "dotbit",
+    ".bit",
     "ENS",
     "unstoppabledomains",
     "PNS",
@@ -67,7 +67,7 @@
     "@ethersproject/providers": "^5.7.2",
     "@siddomains/sidjs": "^0.1.17",
     "@solana/web3.js": "1.67.0",
-    "@unstoppabledomains/resolution": "^8.3.3",
+    "@unstoppabledomains/resolution": "~8.3.3",
     "cross-fetch": "^3.1.5",
     "dotbit": "^0.4.13",
     "ethers": "^5.7.2",
