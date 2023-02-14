@@ -2,7 +2,7 @@
 <p align="center">The all-in-one DID SDK, resolving all decentralized name(Web3 Name).</p>
 <div align="center">
 
-![NPM](https://img.shields.io/npm/l/alldid) ![npm](https://img.shields.io/npm/v/alldid)
+[![NPM](https://img.shields.io/npm/l/alldid)](https://github.com/dotbitHQ/AllDID/blob/main/LICENSE) [![npm](https://img.shields.io/npm/v/alldid)](https://www.npmjs.com/package/alldid)
 </div>
 
 > This is a whole new version of denames. If you are looking for the source code of npm package [denames](https://www.npmjs.com/package/denames)(Deprecated), please check out the branch [denames](https://github.com/dotbitHQ/denames/tree/denames).
