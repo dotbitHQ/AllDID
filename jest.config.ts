@@ -180,6 +180,10 @@ export default {
     '^.+\\.(js|ts|tsx)$': 'ts-jest',
   },
 
+  // @bonfida/name-offer uses esm in their code, we have to transform them to commonjs.
+  // while, for some unclear reason, we can not use the configuration below, so we have to remove the ignorePatterns, and combing with the `transform` above, which transform all the .js files using ts-jest.
+  // however, this will definitely slow down the test, so it should be fixed when we find some time.
+  // https://gist.github.com/rstacruz/511f43265de4939f6ca729a3df7b001c?permalink_comment_id=3835238#gistcomment-3835238
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: [
     // `node_modules/(?!(@bonfida|(.pnpm/@bonfida))/)`,

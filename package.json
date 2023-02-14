@@ -61,6 +61,7 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
+    "@alldid/plugin-nostr": "workspace:^",
     "@bonfida/spl-name-service": "0.1.51",
     "@ensdomains/ens-contracts": "^0.0.15",
     "@ensdomains/ensjs": "^2.1.0",

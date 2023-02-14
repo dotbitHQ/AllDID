@@ -1,16 +1,23 @@
 {
-  "name": "dotbit-template-lib-package",
+  "name": "@alldid/plugin-nostr",
   "version": "0.0.1",
   "main": "lib/index.js",
   "module": "lib.esm/index.js",
-  "types": "lib/index.d.ts",
+  "types": "src/index.ts",
+  "publishConfig": {
+    "types": "lib/index.d.ts"
+  },
   "scripts": {
+    "test": "jest",
     "clear": "rm -rf ./lib/ ./lib.esm/",
     "prepublishOnly": "npm run build",
-    "build": "npm run clear && npm run build:esm & npm run build:commonjs",
+    "build": "npm run clear && npm run build:esm && npm run build:commonjs",
     "build:commonjs": "tsc -p tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.esm.json",
     "publish": "pnpm publish --access public"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "alldid": "workspace:^"
+  }
 }

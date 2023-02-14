@@ -18,8 +18,8 @@
     "baseUrl": "./",
     "outDir": "./lib",
     "paths": {
-//      "alldid": ["src"],
-//      "alldid/*": ["src/*"]
+      "alldid": ["src"],
+      "alldid/*": ["src/*"],
     },
     "skipLibCheck": true
   },
