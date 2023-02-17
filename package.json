@@ -22,12 +22,12 @@
     "lint:fix": "eslint \"{src,example,packages,scripts,tests}/**/*.ts\" --fix"
   },
   "keywords": [
-    "dotbit",
-    ".bit",
     "DID",
     "Decentralized Identity",
     "web3",
     "blockchain",
+    "dotbit",
+    ".bit",
     "ENS",
     "unstoppabledomains",
     "PNS",
@@ -61,13 +61,14 @@
     "vite": "^2.9.14"
   },
   "dependencies": {
+    "@alldid/plugin-nostr": "workspace:^",
     "@bonfida/spl-name-service": "0.1.51",
     "@ensdomains/ens-contracts": "^0.0.15",
     "@ensdomains/ensjs": "^2.1.0",
     "@ethersproject/providers": "^5.7.2",
     "@siddomains/sidjs": "^0.1.17",
     "@solana/web3.js": "1.67.0",
-    "@unstoppabledomains/resolution": "^8.3.3",
+    "@unstoppabledomains/resolution": "~8.3.3",
     "cross-fetch": "^3.1.5",
     "dotbit": "^0.4.13",
     "ethers": "^5.7.2",

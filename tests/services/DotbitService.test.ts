@@ -42,6 +42,19 @@ describe('DotbitService', () => {
       )
     })
 
+    it('leonx.bit\'s records is valid', async () => {
+      expect(await dotbitService.record('leonx.bit', 'address.BSC')).toEqual(
+        [{
+          key: 'address.bsc',
+          label: '',
+          subtype: 'bsc',
+          ttl: 300,
+          type: 'address',
+          value: '0xc72b6f66017246d6a7f159f5c2bf358188ad9eca'
+        }]
+      )
+    })
+
     it('leonx.bit\'s address is 0xc72b6f66017246d6a7f159f5c2bf358188ad9eca', async () => {
       expect((await dotbitService.addr('leonx.bit', 'bsc'))).toEqual(
         {

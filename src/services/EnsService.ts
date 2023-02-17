@@ -180,12 +180,15 @@ export class EnsService extends NamingService {
     return null
   }
 
-  async records (name: string, keys?: string[]): Promise<RecordItem[]> {
+  async records (name: string, keys?: string | string[]): Promise<RecordItem[]> {
     const list: RecordItem[] = []
     if (!keys) {
       const profileKeys = this.getProfileKeys().map((key) => `${KeyPrefix.Profile}.${key.toLowerCase()}`)
       const addressKeys = this.getAddressKeys().map((key) => `${KeyPrefix.Address}.${key.toLowerCase()}`)
       keys = profileKeys.concat(addressKeys)
+    }
+    else if (!Array.isArray(keys)) {
+      keys = [keys]
     }
     const requestArray: Array<Promise<RecordItem | null>> = []
     keys.forEach((key) => requestArray.push(this.record(name, key)))

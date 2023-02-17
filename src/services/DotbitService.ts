@@ -90,9 +90,14 @@ export class DotbitService extends NamingService {
     }
   }
 
-  async records (name: string, keys?: string[]): Promise<RecordItem[]> {
+  async records (name: string, keys: string | string[] = []): Promise<RecordItem[]> {
     let records = await this.dotbit.records(name)
-    records = keys ? records.filter(record => keys.find(key => record.key === key)) : records
+    if (Array.isArray(keys)) {
+      records = records.filter(record => keys.find(key => record.key === key))
+    }
+    else {
+      records = records.filter(record => record.key === keys)
+    }
     return records.map(record => bitARE2RecordItem(record))
   }
 

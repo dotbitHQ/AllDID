@@ -4,7 +4,7 @@
     "baseUrl": "./",
     "outDir": "./lib",
     "paths": {
-        // To override the paths defined in roots tsconfig, especially dotbit
+        // To override the paths defined in roots tsconfig, especially alldid
     },
   },
   "include": [

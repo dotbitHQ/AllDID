@@ -1,3 +1,4 @@
+import { PluginNostr } from '@alldid/plugin-nostr'
 import {
   defaultPnsNetworkId,
   PnsProvider,
@@ -89,6 +90,8 @@ export function createInstance (options = defaultCreateInstanceOptions) {
   alldid.installService(unsService)
   alldid.installService(pnsService)
   // alldid.installService(snsService);
+
+  alldid.installPlugin(new PluginNostr())
   return alldid
 }
 
