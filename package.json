@@ -36,6 +36,7 @@
     "Flowns"
   ],
   "files": [
+    "src",
     "lib",
     "lib.esm"
   ],
