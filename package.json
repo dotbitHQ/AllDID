@@ -17,7 +17,7 @@
     "build:commonjs": "tsc -p tsconfig.build.json",
     "build:esm": "tsc -p tsconfig.build.esm.json",
     "dev:browser": "npm run build && vite ./example/browser",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npx only-allow pnpm && npm run build",
     "lint": "eslint \"{src,example,packages,scripts,tests}/**/*.ts\"",
     "lint:fix": "eslint \"{src,example,packages,scripts,tests}/**/*.ts\" --fix"
   },

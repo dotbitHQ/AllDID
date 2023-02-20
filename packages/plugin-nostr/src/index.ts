@@ -1,4 +1,5 @@
 import { AllDID, DotbitService, EnsService, NamingService, PluginTemplate, RecordItem } from 'alldid'
+import './types'
 
 const nostrRecordsMethodsMap = {
   dotbit: async function (this: DotbitService, name: string): Promise<RecordItem[]> {
