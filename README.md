@@ -43,6 +43,10 @@
     - .hi
   - Space ID - SID
     - .bnb
+  - Starknet.id (TBD)
+    - .stark
+  - Lens Protocal (TBD)
+    - .lens
 
 ## Getting Started
 
